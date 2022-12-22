@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
 
 import { trpc } from "../utils/trpc";
 import ReactPlayer from "react-player";
@@ -11,8 +12,8 @@ const Home = () => {
   const textRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  let [videos, setVideos] = useState<Video[]>([]);
-  let [episodes, setEpisodes] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [episodes, setEpisodes] = useState<Video[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
 
   const searchQuery = trpc.info.search.useMutation();

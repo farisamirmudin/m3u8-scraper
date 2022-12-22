@@ -3,9 +3,9 @@ import { decryptData, encryptData } from "./cipher";
 
 export const getEpisode = async (path: string) => {
   let res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + path);
-  let html = await res.text();
-  let $ = load(html);
-  let embedded = $("iframe").attr("src") ?? "";
+  const html = await res.text();
+  const $ = load(html);
+  const embedded = $("iframe").attr("src") ?? "";
   const id = new URL("https:" + embedded).searchParams.get("id");
   const encryptedId = encryptData(id!);
   res = await fetch(process.env.NEXT_PUBLIC_AJAX_URL + "?id=" + encryptedId, {
