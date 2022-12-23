@@ -125,11 +125,11 @@ const Home = () => {
 
         {/* pagination */}
         {totalPage > 1 && (
-          <section className="flex justify-center gap-2 py-8">
+          <section className="flex justify-center gap-4 py-8">
             {Array.from({ length: totalPage }).map((_, i) => (
               <button
                 key={i}
-                className="h-8 w-8 rounded-md bg-slate-800"
+                className="h-6 w-6 rounded-md bg-slate-800"
                 onClick={() => setCurrentPage(i + 1)}
               >
                 {i + 1}
