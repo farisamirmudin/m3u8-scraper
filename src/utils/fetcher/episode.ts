@@ -64,6 +64,7 @@ export const episode = async (path: string, type: string) => {
     {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     }
   );
