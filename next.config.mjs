@@ -14,7 +14,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["imagecdn.me", "dracdn.com"]
+    domains: ["imagecdn.me", "dracdn.com", "gogocdn.net"]
   }
 };
 export default config;
