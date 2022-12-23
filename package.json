@@ -1,5 +1,6 @@
 {
   "name": "t3-watch",
+  "description": "t3-watch",
   "version": "0.1.0",
   "private": true,
   "scripts": {
