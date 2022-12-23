@@ -1,8 +1,8 @@
 import { router } from "../trpc";
-import { infoRouter } from "./info";
+import { fetcherRouter } from "./fetcher";
 
 export const appRouter = router({
-  info: infoRouter,
+  fetcher: fetcherRouter,
 });
 
 // export type definition of API
