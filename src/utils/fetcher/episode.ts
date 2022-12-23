@@ -40,7 +40,7 @@ export const episode = async (path: string, type: string) => {
   html = await res.text();
   $ = load(html);
 
-  let data = $(`script[data-name="episode"]`).attr("data-value") ?? "";
+  const data = $(`script[data-name="episode"]`).attr("data-value") ?? "";
   const id = $("input#id").attr("value") ?? "";
   const secretKey = $("body").attr("class")?.split("-")[1];
   const iv = $("div.wrapper").attr("class")?.split(" ")[1]?.split("-")[1];
