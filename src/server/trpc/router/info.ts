@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { getEpisode } from "../../../utils/getEpisode";
-import { getVideo } from "../../../utils/getVideo";
+import { episode } from "../../../utils/episode";
+import { episodes } from "../../../utils/episodes";
 import { search } from "../../../utils/search";
 
 import { router, publicProcedure } from "../trpc";
@@ -13,18 +13,18 @@ export const infoRouter = router({
         data: await search(input.text),
       };
     }),
-  getVideo: publicProcedure
+  episodes: publicProcedure
     .input(z.object({ path: z.string() }))
     .mutation(async ({ input }) => {
       return {
-        data: await getVideo(input.path),
+        data: await episodes(input.path),
       };
     }),
-  getEpisode: publicProcedure
+  episode: publicProcedure
     .input(z.object({ path: z.string() }))
     .mutation(async ({ input }) => {
       return {
-        data: await getEpisode(input.path),
+        data: await episode(input.path),
       };
     }),
 });

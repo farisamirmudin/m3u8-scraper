@@ -23,8 +23,8 @@ const Home = () => {
   const [totalPage, setTotalPage] = useState(0);
 
   const searchQuery = trpc.info.search.useMutation();
-  const videoQuery = trpc.info.getVideo.useMutation();
-  const episodeQuery = trpc.info.getEpisode.useMutation();
+  const videoQuery = trpc.info.episodes.useMutation();
+  const episodeQuery = trpc.info.episode.useMutation();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

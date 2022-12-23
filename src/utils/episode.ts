@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 import { decryptData, encryptData } from "./cipher";
 
-export const getEpisode = async (path: string) => {
+export const episode = async (path: string) => {
   let res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + path);
   const html = await res.text();
   const $ = load(html);
@@ -18,5 +18,8 @@ export const getEpisode = async (path: string) => {
   const decryptedData = decryptData(data.data);
   const re = /(https.+?.m3u8)/;
   const files = re.exec(decryptedData);
-  return files?.[0];
+  const m3u8 = files?.reduce((longest, current) => {
+    return longest.length > current.length ? longest : current;
+  });
+  return m3u8;
 };

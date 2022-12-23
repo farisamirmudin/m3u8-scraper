@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 import { Video } from "./search";
 
-export const getVideo = async (path: string) => {
+export const episodes = async (path: string) => {
   const res = await fetch(process.env.NEXT_PUBLIC_BASE_URL + path);
   const html = await res.text();
   const $ = load(html);
