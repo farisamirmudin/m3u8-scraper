@@ -1,5 +1,5 @@
 import { load } from "cheerio";
-export interface Video {
+export interface Show {
   name: string;
   img: string;
   path: string;
@@ -9,7 +9,7 @@ export const search = async (text: string) => {
   const res = await fetch(process.env.NEXT_PUBLIC_SEARCH_URL + text);
   const html = await res.text();
   const $ = load(html);
-  const video: Video[] = [];
+  const video: Show[] = [];
   $("li.video-block").each((i, el) => {
     const name = $(el).find(".name").text().trim() ?? "";
     const img = $(el).find("img").attr("src") ?? "";

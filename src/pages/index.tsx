@@ -1,48 +1,59 @@
 import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
 
 import { trpc } from "../utils/trpc";
 import ReactPlayer from "react-player";
 import { toast, Toaster } from "react-hot-toast";
-import { Video } from "../utils/search";
+import { Show as Show } from "../utils/search";
+import { useDebouncer } from "../utils/debouncerHook";
+import Spinner from "../components/Spinner";
 
 const Home = () => {
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [episodes, setEpisodes] = useState<Video[]>([]);
+  const [shows, setShows] = useState<Show[]>([]);
+  const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPageRef = useRef(100);
 
+  // pagination related
   const lastPostIndex = currentPage * postsPerPageRef.current;
   const firstPostIndex = lastPostIndex - postsPerPageRef.current;
   const [totalPage, setTotalPage] = useState(0);
 
-  const searchQuery = trpc.info.search.useMutation();
-  const videoQuery = trpc.info.episodes.useMutation();
-  const episodeQuery = trpc.info.episode.useMutation();
+  // trpc queries
+  const searchQuery = trpc.info.search.useMutation({
+    retry: 3,
+    onError: (error) => toast.error(error.message),
+  });
+  const videoQuery = trpc.info.episodes.useMutation({
+    retry: 3,
+    onError: (error) => toast.error(error.message),
+  });
+  const episodeQuery = trpc.info.episode.useMutation({
+    retry: 3,
+    onError: (error) => toast.error(error.message),
+  });
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (text === "") {
+  const debounceText = useDebouncer(text);
+  useEffect(() => {
+    if (debounceText === "") {
       return;
     }
-    const notification = toast.loading("Searching Drama...");
-    try {
+    setEpisodes([]);
+    setShows([]);
+    setTotalPage(0);
+    const fetchShows = async () => {
       const videos = await searchQuery.mutateAsync({
-        text,
+        text: debounceText,
       });
-      setVideos(videos.data);
-      setText("");
-    } catch (error) {
-      toast.error("Error encountered. Try again.");
-    }
-    toast.dismiss(notification);
-  };
+      setShows(videos.data);
+    };
+    fetchShows();
+  }, [debounceText]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -64,20 +75,16 @@ const Home = () => {
         </p>
 
         {/* searchbar */}
-        <form className="flex gap-4" onSubmit={handleSubmit}>
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            className="flex-1 rounded-md bg-slate-800 py-1 px-3 placeholder-slate-400 outline-none"
-            type="text"
-            placeholder="Search Drama"
-          />
-          <button className="border-b-2 border-indigo-600 transition-transform duration-200 ease-out hover:scale-110">
-            Search
-          </button>
-        </form>
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="w-full border-b-2 border-indigo-600 bg-transparent py-1 placeholder-slate-400 outline-none"
+          type="text"
+          placeholder="Search Drama"
+        />
 
         {/* video player */}
+        {episodeQuery.isLoading && <Spinner />}
         {hasWindow && url && (
           <section className="space-y-2">
             <p className="text-lg">{title}</p>
@@ -86,17 +93,13 @@ const Home = () => {
               height="auto"
               playing
               controls
-              onPlay={() =>
-                toast.success("Enjoy!", {
-                  duration: 5000,
-                })
-              }
               url={url}
             />
           </section>
         )}
 
         {/* episodes */}
+        {videoQuery.isLoading && <Spinner />}
         {episodes.length !== 0 && (
           <section className="episode-grid">
             {episodes.slice(firstPostIndex, lastPostIndex).map((episode, i) => (
@@ -104,17 +107,11 @@ const Home = () => {
                 key={i}
                 className="rounded-md bg-slate-800 p-2 text-xs transition-transform duration-200 ease-out hover:scale-110"
                 onClick={async () => {
-                  const notification = toast.loading("Playing...");
-                  try {
-                    const url = await episodeQuery.mutateAsync({
-                      path: episode.path,
-                    });
-                    setUrl(url.data ?? "");
-                    setTitle(episode.name);
-                  } catch (error) {
-                    toast.error("Error encountered. Try again.");
-                  }
-                  toast.dismiss(notification);
+                  const url = await episodeQuery.mutateAsync({
+                    path: episode.path,
+                  });
+                  setUrl(url.data ?? "");
+                  setTitle(episode.name);
                 }}
               >
                 EP {episode.name.match(/Episode (.+)/)?.[1]}
@@ -138,35 +135,28 @@ const Home = () => {
           </section>
         )}
 
-        {/* videos */}
-        {videos.length !== 0 && (
+        {/* shows */}
+        {searchQuery.isLoading && <Spinner />}
+        {shows.length !== 0 && (
           <section className="video-grid">
-            {videos.map((video, i) => (
+            {shows.map((video, i) => (
               <div
                 key={i}
                 className="cursor-pointer space-y-2"
                 onClick={async () => {
-                  const notification = toast.loading("Fetching Episodes...");
-                  try {
-                    const videos = await videoQuery.mutateAsync({
-                      path: video.path,
-                    });
-                    setEpisodes(videos.data);
-                    setTotalPage(
-                      Math.ceil(videos.data.length / postsPerPageRef.current)
-                    );
-                  } catch (error) {
-                    toast.error("Error encountered. Try again.");
-                  }
-                  toast.dismiss(notification);
+                  const videos = await videoQuery.mutateAsync({
+                    path: video.path,
+                  });
+                  setEpisodes(videos.data);
+                  setTotalPage(
+                    Math.ceil(videos.data.length / postsPerPageRef.current)
+                  );
                 }}
               >
-                <Image
+                <img
                   className="h-[150px] w-full rounded-md object-cover"
                   src={video.img}
                   alt="banner"
-                  width={100}
-                  height={150}
                 />
                 <p className="text-xs">{video.name}</p>
               </div>
