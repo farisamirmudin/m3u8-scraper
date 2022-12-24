@@ -8,7 +8,6 @@ import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
 import Spinner from "../components/Spinner";
 import { Show } from "../../typings";
-import { CheckIcon } from "@heroicons/react/24/outline";
 
 const Home = () => {
   const [text, setText] = useState("");
