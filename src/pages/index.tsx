@@ -13,13 +13,12 @@ const Home = () => {
   const [text, setText] = useState("");
   const [isDrama, setIsDrama] = useState(false);
   const [url, setUrl] = useState("");
-  const [title, setTitle] = useState("");
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 100;
-  const titleRef = useRef("");
+  const title = useRef("");
 
   const headers = {
     origin: "https://gogohd.net/",
@@ -29,7 +28,7 @@ const Home = () => {
   // pagination related
   const lastPostIndex = currentPage * postsPerPage;
   const firstPostIndex = lastPostIndex - postsPerPage;
-  const [totalPage, setTotalPage] = useState(0);
+  const totalPage = useRef(0);
 
   // trpc queries
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 3 });
@@ -46,7 +45,6 @@ const Home = () => {
     episodeQuery.reset();
     setEpisodes([]);
     setShows([]);
-    setTotalPage(0);
     const fetchShows = async () => {
       try {
         const videos = await searchQuery.mutateAsync({
@@ -115,12 +113,12 @@ const Home = () => {
         {episodeQuery.isError && <p>Error</p>}
         {hasWindow && url && (
           <section className="space-y-2">
-            <p className="text-lg">{titleRef.current}</p>
+            <p className="text-lg">{title.current}</p>
             <ReactPlayer
               config={{
                 file: {
                   attributes: {
-                    headers,
+                    headers: isDrama ? {} : headers,
                   },
                 },
               }}
@@ -150,17 +148,12 @@ const Home = () => {
                       path: episode.path,
                       type: isDrama ? "drama" : "anime",
                     });
-                    titleRef.current = isDrama
+                    title.current = isDrama
                       ? episode.name
-                      : titleRef.current +
+                      : title.current +
                         " Episode " +
                         episode.name.split(" ").at(-1);
                     setUrl(url.data ?? "");
-                    // setTitle((prev) =>
-                    //   isDrama
-                    //     ? episode.name
-                    //     : prev + " Episode " + episode.name.split(" ").at(-1)
-                    // );
                   } catch {
                     toast.error("Error");
                   }
@@ -173,9 +166,9 @@ const Home = () => {
         )}
 
         {/* pagination */}
-        {totalPage > 1 && (
-          <section className="flex justify-center gap-4 py-8">
-            {Array.from({ length: totalPage }).map((_, i) => (
+        {episodes.length !== 0 && totalPage.current > 1 && (
+          <section className="flex justify-center gap-4">
+            {Array.from({ length: totalPage.current }).map((_, i) => (
               <button
                 key={i}
                 className="h-6 w-6 rounded-md bg-slate-800"
@@ -203,9 +196,11 @@ const Home = () => {
                       path: show.path,
                       type: isDrama ? "drama" : "anime",
                     });
+                    title.current = show.name;
+                    totalPage.current = Math.ceil(
+                      videos.data.length / postsPerPage
+                    );
                     setEpisodes(videos.data);
-                    titleRef.current = show.name;
-                    setTotalPage(Math.ceil(videos.data.length / postsPerPage));
                   } catch {
                     toast.error("Error");
                   }
