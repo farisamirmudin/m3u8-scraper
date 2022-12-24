@@ -6,7 +6,6 @@ import { trpc } from "../utils/trpc";
 import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
 import { Show } from "../../typings";
-import { CheckIcon } from "@heroicons/react/24/outline";
 import Spinner from "../components/Spinner";
 import ReactPlayer from "react-player";
 
@@ -19,11 +18,17 @@ const Home = () => {
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPageRef = useRef(100);
+  const postsPerPage = 100;
+  const titleRef = useRef("");
+
+  const headers = {
+    origin: "https://gogohd.net/",
+    referer: "https://gogohd.net/",
+  };
 
   // pagination related
-  const lastPostIndex = currentPage * postsPerPageRef.current;
-  const firstPostIndex = lastPostIndex - postsPerPageRef.current;
+  const lastPostIndex = currentPage * postsPerPage;
+  const firstPostIndex = lastPostIndex - postsPerPage;
   const [totalPage, setTotalPage] = useState(0);
 
   // trpc queries
@@ -36,6 +41,9 @@ const Home = () => {
     if (debounceText === "") {
       return;
     }
+    searchQuery.reset();
+    episodesQuery.reset();
+    episodeQuery.reset();
     setEpisodes([]);
     setShows([]);
     setTotalPage(0);
@@ -58,7 +66,6 @@ const Home = () => {
       setHasWindow(true);
     }
   }, []);
-
   return (
     <>
       <Toaster position="bottom-center" />
@@ -82,37 +89,25 @@ const Home = () => {
         />
 
         {/* checkbox */}
-        <div className="flex gap-6">
-          <div className="relative">
-            <CheckIcon
-              className={`absolute top-[2px] left-0 h-5 w-5 text-indigo-600 ${
-                isDrama && "hidden"
-              }`}
-            />
-            <input
-              className="absolute top-[2px] left-0 h-5 w-5 appearance-none rounded-md border-2 border-indigo-600"
-              id="animeCheckBox"
-              type="checkbox"
-              checked={!isDrama}
-              onChange={() => setIsDrama(false)}
-            />
-          </div>
-          <label htmlFor="animeCheckBox">Anime</label>
-          <div className="relative">
-            <CheckIcon
-              className={`absolute top-[2px] left-0 h-5 w-5 text-indigo-600 ${
-                !isDrama && "hidden"
-              }`}
-            />
-            <input
-              className="absolute top-[2px] left-0 h-5 w-5 appearance-none rounded-md border-2 border-indigo-600"
-              id="dramaCheckBox"
-              type="checkbox"
-              checked={isDrama}
-              onChange={() => setIsDrama(true)}
-            />
-          </div>
-          <label htmlFor="dramaCheckBox">Korean Drama</label>
+        <div className="flex gap-8">
+          <button
+            onClick={() => setIsDrama(false)}
+            className={`${
+              !isDrama &&
+              "underline decoration-indigo-600 decoration-2 underline-offset-4"
+            }`}
+          >
+            Anime
+          </button>
+          <button
+            onClick={() => setIsDrama(true)}
+            className={`${
+              isDrama &&
+              "underline decoration-indigo-600 decoration-2 underline-offset-4"
+            }`}
+          >
+            Korean Drama
+          </button>
         </div>
 
         {/* video player */}
@@ -120,16 +115,14 @@ const Home = () => {
         {episodeQuery.isError && <p>Error</p>}
         {hasWindow && url && (
           <section className="space-y-2">
-            <p className="text-lg">{title}</p>
+            <p className="text-lg">{titleRef.current}</p>
             <ReactPlayer
               config={{
                 file: {
                   attributes: {
-                    headers: {
-                      'Referer': "https://gogohd.net/"
-                    }
-                  }
-                }
+                    headers,
+                  },
+                },
               }}
               width="100%"
               height="auto"
@@ -142,7 +135,9 @@ const Home = () => {
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
         {episodesQuery.isError && <p>Error</p>}
-        {episodeQuery.isSuccess && episodes.length === 0 && <p>No episode out yet.</p>}
+        {episodeQuery.isSuccess && episodes.length === 0 && (
+          <p>No episode out yet.</p>
+        )}
         {episodes.length !== 0 && (
           <section className="episode-grid">
             {episodes.slice(firstPostIndex, lastPostIndex).map((episode, i) => (
@@ -155,14 +150,23 @@ const Home = () => {
                       path: episode.path,
                       type: isDrama ? "drama" : "anime",
                     });
+                    titleRef.current = isDrama
+                      ? episode.name
+                      : titleRef.current +
+                        " Episode " +
+                        episode.name.split(" ").at(-1);
                     setUrl(url.data ?? "");
-                    setTitle(episode.name);
+                    // setTitle((prev) =>
+                    //   isDrama
+                    //     ? episode.name
+                    //     : prev + " Episode " + episode.name.split(" ").at(-1)
+                    // );
                   } catch {
                     toast.error("Error");
                   }
                 }}
               >
-                {episode.name}
+                EP {episode.name.split(" ").at(-1)}
               </button>
             ))}
           </section>
@@ -189,35 +193,34 @@ const Home = () => {
         {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
         {shows.length !== 0 && (
           <section className="video-grid">
-            {shows.map((video, i) => (
+            {shows.map((show, i) => (
               <div
                 key={i}
                 className="cursor-pointer space-y-2 transition-transform duration-200 ease-out hover:scale-105"
                 onClick={async () => {
                   try {
                     const videos = await episodesQuery.mutateAsync({
-                      path: video.path,
+                      path: show.path,
                       type: isDrama ? "drama" : "anime",
                     });
                     setEpisodes(videos.data);
-                    setTotalPage(
-                      Math.ceil(videos.data.length / postsPerPageRef.current)
-                    );
+                    titleRef.current = show.name;
+                    setTotalPage(Math.ceil(videos.data.length / postsPerPage));
                   } catch {
                     toast.error("Error");
                   }
                 }}
               >
-                {video.img && (
+                {show.img && (
                   <Image
                     className="h-36 w-full object-cover"
-                    src={video.img}
+                    src={show.img}
                     width={400}
                     height={800}
                     alt="banner"
                   />
                 )}
-                <p className="text-xs">{video.name}</p>
+                <p className="text-xs">{show.name}</p>
               </div>
             ))}
           </section>

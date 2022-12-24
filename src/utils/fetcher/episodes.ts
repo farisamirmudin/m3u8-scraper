@@ -8,10 +8,9 @@ export const episodes = async (path: string, type: string) => {
     const $ = load(html);
     const episodes: Show[] = [];
     $("ul.listing.items.lists li").each((i, el) => {
-      const path = $(el).find("a").attr("href") ?? "";
-      const img = $(el).find(".picture img").attr("src") ?? "";
-      const name =
-        "EP " + $(el).find(".name").text().trim().split(" ").at(-1) ?? "";
+      const path = $(el).find("a").attr("href")?.trim() ?? "";
+      const img = $(el).find(".picture img").attr("src")?.trim() ?? "";
+      const name = $(el).find(".name").text().trim() ?? "";
       episodes.push({ name, path, img });
     });
     return episodes;
