@@ -1,12 +1,9 @@
 import { load } from "cheerio";
-export interface Show {
-  name: string;
-  img: string;
-  path: string;
-}
+import { Show } from "../../typings";
+
 export const search = async (text: string) => {
   if (!text) return [];
-  const res = await fetch(process.env.NEXT_PUBLIC_SEARCH_URL + text);
+  const res = await fetch(process.env.NEXT_PUBLIC_DRAMA_SEARCH_URL + text);
   const html = await res.text();
   const $ = load(html);
   const video: Show[] = [];
