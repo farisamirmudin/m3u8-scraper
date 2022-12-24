@@ -17,6 +17,8 @@ const Home = () => {
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
+  const [selectedPagination, setSelectedPagination] = useState(1);
+  const [columns, setColumns] = useState(0);
   const selectedShow = useRef("");
   const selectedEpisode = useRef("");
   const title = useRef("");
@@ -36,6 +38,8 @@ const Home = () => {
     episodeQuery.reset();
     selectedShow.current = "";
     selectedEpisode.current = "";
+    setColumns(0);
+    setSelectedPagination(1);
     setEpisodes([]);
     setShows([]);
     const fetchShows = async () => {
@@ -70,6 +74,7 @@ const Home = () => {
       toast.error("Error");
     }
   };
+  console.log(url);
 
   return (
     <>
@@ -90,7 +95,7 @@ const Home = () => {
           onChange={(e) => setText(e.target.value)}
           className="w-full border-b-2 border-indigo-600 bg-transparent py-1 placeholder-slate-400 outline-none"
           type="text"
-          placeholder="Search Drama"
+          placeholder="Search..."
         />
 
         {/* options */}
@@ -115,7 +120,7 @@ const Home = () => {
           </button>
         </div>
         <p className="text-sm">
-          Some of the animes cant be played. I am trying to solve it.
+          Some of the animes can't be played. I am trying to solve it.
         </p>
 
         {/* video player */}
@@ -146,6 +151,10 @@ const Home = () => {
               episodes={episodes}
               handleSelectEpisode={handleSelectEpisode}
               selectedEpisode={selectedEpisode}
+              selectedPagination={selectedPagination}
+              setSelectedPagination={setSelectedPagination}
+              columns={columns}
+              setColumns={setColumns}
             />
           </section>
         )}
@@ -169,6 +178,8 @@ const Home = () => {
                       type: isDrama ? "drama" : "anime",
                     });
                     selectedShow.current = show.path;
+                    setSelectedPagination(1);
+                    setColumns(0);
                     setEpisodes(videos.data);
                   } catch {
                     toast.error("Error");
