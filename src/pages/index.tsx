@@ -3,12 +3,12 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { trpc } from "../utils/trpc";
-import ReactPlayer from "react-player";
 import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
-import Spinner from "../components/Spinner";
 import { Show } from "../../typings";
 import { CheckIcon } from "@heroicons/react/24/outline";
+import Spinner from "../components/Spinner";
+import ReactPlayer from "react-player";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -117,12 +117,20 @@ const Home = () => {
 
         {/* video player */}
         {episodeQuery.isLoading && <Spinner />}
-        {episodeQuery.isError && <p>Error encountered. Please try again.</p>}
+        {episodeQuery.isError && <p>Error</p>}
         {hasWindow && url && (
           <section className="space-y-2">
             <p className="text-lg">{title}</p>
             <ReactPlayer
-              onReady={() => toast.success("Enjoy!")}
+              config={{
+                file: {
+                  attributes: {
+                    headers: {
+                      'Referer': "https://gogohd.net/"
+                    }
+                  }
+                }
+              }}
               width="100%"
               height="auto"
               controls
@@ -133,7 +141,8 @@ const Home = () => {
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
-        {episodesQuery.isError && <p>Error encountered. Please try again.</p>}
+        {episodesQuery.isError && <p>Error</p>}
+        {episodeQuery.isSuccess && episodes.length === 0 && <p>No episode out yet.</p>}
         {episodes.length !== 0 && (
           <section className="episode-grid">
             {episodes.slice(firstPostIndex, lastPostIndex).map((episode, i) => (
@@ -176,7 +185,8 @@ const Home = () => {
 
         {/* shows */}
         {searchQuery.isLoading && <Spinner />}
-        {searchQuery.isError && <p>Error encountered. Please try again.</p>}
+        {searchQuery.isError && <p>Error</p>}
+        {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
         {shows.length !== 0 && (
           <section className="video-grid">
             {shows.map((video, i) => (
