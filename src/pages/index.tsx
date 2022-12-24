@@ -8,6 +8,7 @@ import { useDebouncer } from "../utils/debouncerHook";
 import { Show } from "../../typings";
 import Spinner from "../components/Spinner";
 import ReactPlayer from "react-player";
+import EpisodesGrid from "../components/EpisodesGrid";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -16,19 +17,9 @@ const Home = () => {
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 100;
+  const selectedShow = useRef("");
+  const selectedEpisode = useRef("");
   const title = useRef("");
-
-  // const headers = {
-  //   origin: "https://gogohd.net/",
-  //   referer: "https://gogohd.net/",
-  // };
-
-  // pagination related
-  const lastPostIndex = currentPage * postsPerPage;
-  const firstPostIndex = lastPostIndex - postsPerPage;
-  const totalPage = useRef(0);
 
   // trpc queries
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 3 });
@@ -43,6 +34,8 @@ const Home = () => {
     searchQuery.reset();
     episodesQuery.reset();
     episodeQuery.reset();
+    selectedShow.current = "";
+    selectedEpisode.current = "";
     setEpisodes([]);
     setShows([]);
     const fetchShows = async () => {
@@ -60,10 +53,24 @@ const Home = () => {
   }, [debounceText]);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setHasWindow(true);
-    }
+    if (typeof window === "undefined") return;
+    setHasWindow(true);
   }, []);
+
+  const handleSelectEpisode = async (episode: Show) => {
+    try {
+      const url = await episodeQuery.mutateAsync({
+        path: episode.path,
+        type: isDrama ? "drama" : "anime",
+      });
+      title.current = episode.name;
+      selectedEpisode.current = episode.path;
+      setUrl(url.data ?? "");
+    } catch {
+      toast.error("Error");
+    }
+  };
+
   return (
     <>
       <Toaster position="bottom-center" />
@@ -86,7 +93,7 @@ const Home = () => {
           placeholder="Search Drama"
         />
 
-        {/* checkbox */}
+        {/* options */}
         <div className="flex gap-8">
           <button
             onClick={() => setIsDrama(false)}
@@ -107,6 +114,9 @@ const Home = () => {
             Korean Drama
           </button>
         </div>
+        <p className="text-sm">
+          Some of the animes cant be played. I am trying to solve it.
+        </p>
 
         {/* video player */}
         {episodeQuery.isLoading && <Spinner />}
@@ -115,16 +125,10 @@ const Home = () => {
           <section className="space-y-2">
             <p className="text-lg">{title.current}</p>
             <ReactPlayer
-              // config={{
-              //   file: {
-              //     attributes: {
-              //       headers: isDrama ? {} : headers,
-              //     },
-              //   },
-              // }}
               width="100%"
               height="auto"
               controls
+              playing
               url={url}
             />
           </section>
@@ -137,46 +141,12 @@ const Home = () => {
           <p>No episode out yet.</p>
         )}
         {episodes.length !== 0 && (
-          <section className="episode-grid">
-            {episodes.slice(firstPostIndex, lastPostIndex).map((episode, i) => (
-              <button
-                key={i}
-                className="rounded-md bg-slate-800 p-2 text-xs transition-transform duration-200 ease-out hover:scale-110"
-                onClick={async () => {
-                  try {
-                    const url = await episodeQuery.mutateAsync({
-                      path: episode.path,
-                      type: isDrama ? "drama" : "anime",
-                    });
-                    title.current = isDrama
-                      ? episode.name
-                      : title.current +
-                        " Episode " +
-                        episode.name.split(" ").at(-1);
-                    setUrl(url.data ?? "");
-                  } catch {
-                    toast.error("Error");
-                  }
-                }}
-              >
-                EP {episode.name.split(" ").at(-1)}
-              </button>
-            ))}
-          </section>
-        )}
-
-        {/* pagination */}
-        {episodes.length !== 0 && totalPage.current > 1 && (
-          <section className="flex justify-center gap-4">
-            {Array.from({ length: totalPage.current }).map((_, i) => (
-              <button
-                key={i}
-                className="h-6 w-6 rounded-md bg-slate-800"
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
+          <section>
+            <EpisodesGrid
+              episodes={episodes}
+              handleSelectEpisode={handleSelectEpisode}
+              selectedEpisode={selectedEpisode}
+            />
           </section>
         )}
 
@@ -189,33 +159,38 @@ const Home = () => {
             {shows.map((show, i) => (
               <div
                 key={i}
-                className="cursor-pointer space-y-2 transition-transform duration-200 ease-out hover:scale-105"
+                className={`cursor-pointer space-y-2 transition-transform duration-200 ease-out hover:scale-105 ${
+                  selectedShow.current === show.path && "scale-105"
+                }`}
                 onClick={async () => {
                   try {
                     const videos = await episodesQuery.mutateAsync({
                       path: show.path,
                       type: isDrama ? "drama" : "anime",
                     });
-                    title.current = show.name;
-                    totalPage.current = Math.ceil(
-                      videos.data.length / postsPerPage
-                    );
+                    selectedShow.current = show.path;
                     setEpisodes(videos.data);
                   } catch {
                     toast.error("Error");
                   }
                 }}
               >
-                {show.img && (
-                  <Image
-                    className="h-36 w-full object-cover"
-                    src={show.img}
-                    width={400}
-                    height={800}
-                    alt="banner"
-                  />
-                )}
-                <p className="text-xs">{show.name}</p>
+                <Image
+                  className="h-36 w-full rounded-md object-cover"
+                  src={show.img!}
+                  width={400}
+                  height={800}
+                  alt="banner"
+                />
+
+                <p
+                  className={`text-center text-xs ${
+                    selectedShow.current === show.path &&
+                    "underline decoration-indigo-600 decoration-[3px] underline-offset-2"
+                  }`}
+                >
+                  {show.name}
+                </p>
               </div>
             ))}
           </section>
