@@ -24,9 +24,9 @@ export const episode = async (path: string, type: string) => {
 
     const encSource: { data: string } = await res.json();
     const source = decryptData(encSource.data, key, iv);
-    const re = /(https.+?.m3u8)/;
-    const files = re.exec(source);
-    const m3u8 = files?.reduce((longest, current) => {
+    const pattern = /(https.+?m3u8)/g;
+    const m3u8Links = source.match(pattern);
+    const m3u8 = m3u8Links?.reduce((longest, current) => {
       return longest.length > current.length ? longest : current;
     });
     return m3u8;
@@ -67,9 +67,9 @@ export const episode = async (path: string, type: string) => {
   );
   const encSource: { data: string } = await res.json();
   const source = decryptData(encSource.data, secondKey, iv);
-  const re = /(https.+?.m3u8)/;
-  const files = re.exec(source);
-  const m3u8 = files?.reduce((longest, current) => {
+  const pattern = /(https.+?m3u8)/g;
+  const m3u8Links = source.match(pattern);
+  const m3u8 = m3u8Links?.reduce((longest, current) => {
     return longest.length > current.length ? longest : current;
   });
   return m3u8;
