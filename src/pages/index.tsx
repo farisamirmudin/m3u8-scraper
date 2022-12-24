@@ -120,7 +120,7 @@ const Home = () => {
           </button>
         </div>
         <p className="text-sm">
-          Some of the animes can't be played. I am trying to solve it.
+          Some of the animes cannot be played. Currently fixing it.
         </p>
 
         {/* video player */}
