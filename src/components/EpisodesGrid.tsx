@@ -1,26 +1,40 @@
-import { useEffect, useState, useRef, MutableRefObject } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  MutableRefObject,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Show } from "../../typings";
+
 interface Props {
   episodes: Show[];
   handleSelectEpisode: (episode: Show) => Promise<void>;
   selectedEpisode: MutableRefObject<string>;
+  selectedPagination: number;
+  setSelectedPagination: Dispatch<SetStateAction<number>>;
+  columns: number;
+  setColumns: Dispatch<SetStateAction<number>>;
 }
+
 const EpisodesGrid: React.FC<Props> = ({
   episodes,
   handleSelectEpisode,
   selectedEpisode,
+  selectedPagination,
+  setSelectedPagination,
+  columns,
+  setColumns,
 }) => {
-  // console.log(episodes);
   const gridRef = useRef<HTMLDivElement>(null);
   const buttonWidth = 60;
   const gap = 24;
   const rows = useRef(10);
-  const [columns, setColumns] = useState(0);
-  const [selectedPagination, setSelectedPagination] = useState(1);
   const totalPagination = useRef(0);
+  const buttonsPerPagination = useRef(0);
   const startIndex = useRef(0);
   const lastIndex = useRef(0);
-  const buttonsPerPagination = useRef(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,6 +46,7 @@ const EpisodesGrid: React.FC<Props> = ({
       );
       lastIndex.current = buttonsPerPagination.current * selectedPagination;
       startIndex.current = lastIndex.current - buttonsPerPagination.current;
+
       setColumns(columns);
     };
 
@@ -41,7 +56,7 @@ const EpisodesGrid: React.FC<Props> = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [episodes]);
 
   const handleChangePagination = (symbol: string) => {
     if (selectedPagination === (symbol === "<" ? 1 : totalPagination.current))
