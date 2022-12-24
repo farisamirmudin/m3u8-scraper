@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-export const useDebouncer = (input: string, delay = 1000) => {
+export const useDebouncer = (input: string, delay = 400) => {
   const [debouncerValue, setDebouncerValue] = useState(input);
   useEffect(() => {
     const timer = setTimeout(() => {
