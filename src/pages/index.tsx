@@ -74,7 +74,6 @@ const Home = () => {
       toast.error("Error");
     }
   };
-  console.log(url);
 
   return (
     <>
