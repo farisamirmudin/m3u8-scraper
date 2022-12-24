@@ -20,10 +20,10 @@ const Home = () => {
   const postsPerPage = 100;
   const title = useRef("");
 
-  const headers = {
-    origin: "https://gogohd.net/",
-    referer: "https://gogohd.net/",
-  };
+  // const headers = {
+  //   origin: "https://gogohd.net/",
+  //   referer: "https://gogohd.net/",
+  // };
 
   // pagination related
   const lastPostIndex = currentPage * postsPerPage;
@@ -115,13 +115,13 @@ const Home = () => {
           <section className="space-y-2">
             <p className="text-lg">{title.current}</p>
             <ReactPlayer
-              config={{
-                file: {
-                  attributes: {
-                    headers: isDrama ? {} : headers,
-                  },
-                },
-              }}
+              // config={{
+              //   file: {
+              //     attributes: {
+              //       headers: isDrama ? {} : headers,
+              //     },
+              //   },
+              // }}
               width="100%"
               height="auto"
               controls
