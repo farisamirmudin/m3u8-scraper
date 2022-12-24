@@ -69,8 +69,18 @@ export const episode = async (path: string, type: string) => {
   const source = decryptData(encSource.data, secondKey, iv);
   const pattern = /(https.+?m3u8)/g;
   const m3u8Links = source.match(pattern);
-  const m3u8 = m3u8Links?.reduce((longest, current) => {
-    return longest.length > current.length ? longest : current;
+  // console.log(m3u8Links);
+  let m3u8: string | undefined = "";
+  m3u8Links?.forEach((link) => {
+    if (link.includes("cache")) {
+      m3u8 = link;
+    }
   });
+  if (m3u8 === "") {
+    m3u8 = m3u8Links?.reduce((longest, current) => {
+      return longest.length > current.length ? longest : current;
+    });
+  }
+  // console.log(m3u8);
   return m3u8;
 };
