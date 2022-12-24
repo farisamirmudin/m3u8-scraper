@@ -5,7 +5,7 @@ import { search } from "../../../utils/search";
 
 import { router, publicProcedure } from "../trpc";
 
-export const infoRouter = router({
+export const fetcherRouter = router({
   search: publicProcedure
     .input(z.object({ text: z.string() }))
     .mutation(async ({ input }) => {
