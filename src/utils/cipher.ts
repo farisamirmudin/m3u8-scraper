@@ -1,10 +1,8 @@
 import { createCipheriv, createDecipheriv } from "crypto";
 
-export const encryptData = (text: string) => {
+export const encryptData = (text: string, key:string, iv:string) => {
   const cipher = createCipheriv(
-    "aes-256-cbc",
-    process.env.NEXT_PUBLIC_SECRET_KEY!,
-    process.env.NEXT_PUBLIC_IV!
+    "aes-256-cbc",key,iv
   );
   let encrypted = cipher.update(text, "utf8", "base64");
   encrypted += cipher.final("base64");
@@ -12,11 +10,9 @@ export const encryptData = (text: string) => {
   return encrypted;
 };
 
-export const decryptData = (text: string) => {
+export const decryptData = (text: string, key:string, iv:string) => {
   const decipher = createDecipheriv(
-    "aes-256-cbc",
-    process.env.NEXT_PUBLIC_SECRET_KEY!,
-    process.env.NEXT_PUBLIC_IV!
+    "aes-256-cbc",key,iv
   );
   decipher.setAutoPadding(false);
 
