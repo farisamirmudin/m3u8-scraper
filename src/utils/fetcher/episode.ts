@@ -1,5 +1,5 @@
 import { load } from "cheerio";
-import { decryptData, encryptData } from "../cipher";
+import { decrypt, encrypt } from "../cipher";
 
 export const episode = async (path: string, type: string) => {
   if (type === "drama") {
@@ -13,7 +13,7 @@ export const episode = async (path: string, type: string) => {
     const id = new URL("https:" + embedded).searchParams.get("id");
 
     if (!key || !iv) return "";
-    const encId = encryptData(id!, key, iv);
+    const encId = encrypt(id!, key, iv);
 
     res = await fetch(process.env.NEXT_PUBLIC_DRAMA_AJAX_URL + "?id=" + encId, {
       headers: {
@@ -23,13 +23,10 @@ export const episode = async (path: string, type: string) => {
     });
 
     const encSource: { data: string } = await res.json();
-    const source = decryptData(encSource.data, key, iv);
+    const source = decrypt(encSource.data, key, iv);
     const pattern = /(https.+?m3u8)/g;
-    const m3u8Links = source.match(pattern);
-    const m3u8 = m3u8Links?.reduce((longest, current) => {
-      return longest.length > current.length ? longest : current;
-    });
-    return m3u8;
+    const links = source.match(pattern)?.toString();
+    return links?.split(",");
   }
   let res = await fetch(process.env.NEXT_PUBLIC_ANIME_BASE_URL + path.trim());
   let html = await res.text();
@@ -50,8 +47,8 @@ export const episode = async (path: string, type: string) => {
     ?.split("-")[1];
 
   if (!secretKey || !iv || !secondKey) return "";
-  const params = decryptData(data, secretKey, iv);
-  const encId = encryptData(id, secretKey, iv);
+  const params = decrypt(data, secretKey, iv);
+  const encId = encrypt(id, secretKey, iv);
 
   res = await fetch(
     process.env.NEXT_PUBLIC_ANIME_AJAX_URL +
@@ -66,21 +63,8 @@ export const episode = async (path: string, type: string) => {
     }
   );
   const encSource: { data: string } = await res.json();
-  const source = decryptData(encSource.data, secondKey, iv);
+  const source = decrypt(encSource.data, secondKey, iv);
   const pattern = /(https.+?m3u8)/g;
-  const m3u8Links = source.match(pattern);
-  // console.log(m3u8Links);
-  let m3u8: string | undefined = "";
-  m3u8Links?.forEach((link) => {
-    if (link.includes("cache")) {
-      m3u8 = link;
-    }
-  });
-  if (m3u8 === "") {
-    m3u8 = m3u8Links?.reduce((longest, current) => {
-      return longest.length > current.length ? longest : current;
-    });
-  }
-  // console.log(m3u8);
-  return m3u8;
+  const links = source.match(pattern)?.toString();
+  return links?.split(",");
 };
