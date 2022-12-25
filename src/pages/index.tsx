@@ -13,7 +13,7 @@ import EpisodesGrid from "../components/EpisodesGrid";
 const Home = () => {
   const [text, setText] = useState("");
   const [isDrama, setIsDrama] = useState(false);
-  const [videos, setVideos] = useState<string[] | string>();
+  const [videos, setVideos] = useState<string[]>();
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
@@ -165,7 +165,7 @@ const Home = () => {
             />
           </section>
         )}
-        {corsError && <p>No video can be played</p>}
+        {/* {corsError && <p>No video can be played</p>} */}
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}

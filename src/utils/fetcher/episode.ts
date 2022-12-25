@@ -9,10 +9,10 @@ export const episode = async (path: string, type: string) => {
     const html = await res.text();
     const $ = load(html);
 
-    const embedded = $("iframe").attr("src") ?? "";
-    const id = new URL("https:" + embedded).searchParams.get("id");
+    const streaming = $("iframe").attr("src") ?? "";
+    const id = new URL("https:" + streaming).searchParams.get("id");
 
-    if (!key || !iv) return "";
+    if (!key || !iv) return [];
     const encId = encrypt(id!, key, iv);
 
     res = await fetch(process.env.NEXT_PUBLIC_DRAMA_AJAX_URL + "?id=" + encId, {
@@ -26,7 +26,8 @@ export const episode = async (path: string, type: string) => {
     const source = decrypt(encSource.data, key, iv);
     const pattern = /(https.+?m3u8)/g;
     const links = source.match(pattern)?.toString();
-    return links?.split(",");
+    const linksSet = new Set(links?.split(","));
+    return [...linksSet];
   }
   let res = await fetch(process.env.NEXT_PUBLIC_ANIME_BASE_URL + path.trim());
   let html = await res.text();
@@ -35,12 +36,12 @@ export const episode = async (path: string, type: string) => {
   res = await fetch("https:" + streaming);
   html = await res.text();
   $ = load(html);
-  const serverwithtoken = $(`li[data-provider="serverwithtoken"]`).attr(
-    "data-video"
-  );
-  res = await fetch("https:" + streaming);
-  html = await res.text();
-  $ = load(html);
+  // const serverwithtoken = $(`li[data-provider="serverwithtoken"]`).attr(
+  //   "data-video"
+  // );
+  // res = await fetch(serverwithtoken!);
+  // html = await res.text();
+  // $ = load(html);
   const data = $(`script[data-name="episode"]`).attr("data-value") ?? "";
   const id = $("input#id").attr("value") ?? "";
   const secretKey = $("body").attr("class")?.split("-")[1];
@@ -50,7 +51,7 @@ export const episode = async (path: string, type: string) => {
     ?.split(" ")[1]
     ?.split("-")[1];
 
-  if (!secretKey || !iv || !secondKey) return "";
+  if (!secretKey || !iv || !secondKey) return [];
   const params = decrypt(data, secretKey, iv);
   const encId = encrypt(id, secretKey, iv);
 
@@ -61,6 +62,7 @@ export const episode = async (path: string, type: string) => {
       "&alias=" +
       params,
     {
+      method: "POST",
       headers: {
         "X-Requested-With": "XMLHttpRequest",
       },
@@ -71,5 +73,6 @@ export const episode = async (path: string, type: string) => {
   const pattern = /(https.+?m3u8)/g;
   const links = source.match(pattern)?.toString();
   // console.log(source);
-  return links?.split(",");
+  const linksSet = new Set(links?.split(","));
+  return [...linksSet];
 };
