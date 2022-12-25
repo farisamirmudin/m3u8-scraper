@@ -77,9 +77,11 @@ const Home = () => {
       });
       title.current = episode.name;
       selectedEpisode.current = episode.path;
+      idx.current = 0;
       console.log(videos.data);
       setVideos(videos.data);
       setSelectedVideo(videos.data?.[idx.current]);
+      setCorsError(false);
     } catch {
       toast.error("Error");
     }
