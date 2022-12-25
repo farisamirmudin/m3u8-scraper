@@ -6,7 +6,6 @@ import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
 import { Show } from "../../typings";
 import Spinner from "../components/Spinner";
-import ReactPlayer from "react-player";
 import EpisodesGrid from "../components/EpisodesGrid";
 import SelectOption from "../components/SelectOption";
 import Player from "../components/Player";
@@ -16,7 +15,6 @@ import SearchBar from "../components/SearchBar";
 const Home = () => {
   const [text, setText] = useState("");
   const [isDrama, setIsDrama] = useState(false);
-  const [servers, setServers] = useState<string[]>();
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
@@ -26,6 +24,7 @@ const Home = () => {
   const selectedEpisode = useRef("");
   const title = useRef("");
   const selectedServerRef = useRef(0);
+  const serversRef = useRef<string[]>([]);
   const [selectedServer, setSelectedServer] = useState<string>();
   const [corsError, setCorsError] = useState(false);
 
@@ -81,8 +80,8 @@ const Home = () => {
       title.current = episode.name;
       selectedEpisode.current = episode.path;
       selectedServerRef.current = 0;
-      setServers(servers.data);
-      setSelectedServer(servers.data?.[selectedServerRef.current]);
+      serversRef.current = servers.data;
+      setSelectedServer(serversRef.current[selectedServerRef.current]);
       setCorsError(false);
     } catch {
       toast.error("Error");
@@ -116,13 +115,12 @@ const Home = () => {
 
   const playerError = (error: any) => {
     if (error !== "hlsError") return;
-    if (!servers) return;
-    if (selectedServerRef.current === servers.length - 1) {
+    if (selectedServerRef.current === serversRef.current.length - 1) {
       setCorsError(true);
       return;
     }
     selectedServerRef.current += 1;
-    setSelectedServer(servers[selectedServerRef.current]);
+    setSelectedServer(serversRef.current[selectedServerRef.current]);
   };
 
   const playerProps = {
@@ -153,7 +151,9 @@ const Home = () => {
         {/* video player */}
         {serversQuery.isLoading && <Spinner />}
         {serversQuery.isError && <p>Error</p>}
-        {hasWindow && !corsError && servers && <Player {...playerProps} />}
+        {hasWindow && !corsError && serversRef.current && (
+          <Player {...playerProps} />
+        )}
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
