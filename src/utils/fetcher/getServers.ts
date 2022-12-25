@@ -1,7 +1,7 @@
 import { load } from "cheerio";
 import { decrypt, encrypt } from "../cipher";
 
-export const episode = async (path: string, drama: boolean) => {
+export const getServers = async (path: string, drama: boolean) => {
   if (drama) {
     const key = process.env.NEXT_PUBLIC_DRAMA_SECRET_KEY;
     const iv = process.env.NEXT_PUBLIC_DRAMA_IV;

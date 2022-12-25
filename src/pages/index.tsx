@@ -31,15 +31,15 @@ const Home = () => {
 
   // trpc queries
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 3 });
-  const episodesQuery = trpc.fetcher.episodes.useMutation({ retry: 3 });
-  const episodeQuery = trpc.fetcher.episode.useMutation({ retry: 3 });
+  const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 3 });
+  const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 3 });
 
   const debounceText = useDebouncer(text);
 
   const reset = () => {
     searchQuery.reset();
     episodesQuery.reset();
-    episodeQuery.reset();
+    serversQuery.reset();
     selectedShow.current = "";
     selectedEpisode.current = "";
     setColumns(0);
@@ -55,11 +55,11 @@ const Home = () => {
     reset();
     const fetchShows = async () => {
       try {
-        const videos = await searchQuery.mutateAsync({
+        const shows = await searchQuery.mutateAsync({
           text: debounceText,
           drama: isDrama,
         });
-        setShows(videos.data);
+        setShows(shows.data);
       } catch {
         toast.error("Error");
       }
@@ -74,16 +74,15 @@ const Home = () => {
 
   const handleSelectEpisode = async (episode: Show) => {
     try {
-      const videos = await episodeQuery.mutateAsync({
+      const servers = await serversQuery.mutateAsync({
         path: episode.path,
         drama: isDrama,
       });
       title.current = episode.name;
       selectedEpisode.current = episode.path;
       selectedServerRef.current = 0;
-      // console.log(videos.data);
-      setServers(videos.data);
-      setSelectedServer(videos.data?.[selectedServerRef.current]);
+      setServers(servers.data);
+      setSelectedServer(servers.data?.[selectedServerRef.current]);
       setCorsError(false);
     } catch {
       toast.error("Error");
@@ -92,14 +91,14 @@ const Home = () => {
 
   const handleSelectShow = async (show: Show) => {
     try {
-      const videos = await episodesQuery.mutateAsync({
+      const episodes = await episodesQuery.mutateAsync({
         path: show.path,
         drama: isDrama,
       });
       selectedShow.current = show.path;
       setSelectedPagination(1);
       setColumns(0);
-      setEpisodes(videos.data);
+      setEpisodes(episodes.data);
     } catch {
       toast.error("Error");
     }
@@ -152,14 +151,14 @@ const Home = () => {
         <SelectOption isDrama={isDrama} setIsDrama={setIsDrama} />
 
         {/* video player */}
-        {episodeQuery.isLoading && <Spinner />}
-        {episodeQuery.isError && <p>Error</p>}
+        {serversQuery.isLoading && <Spinner />}
+        {serversQuery.isError && <p>Error</p>}
         {hasWindow && !corsError && servers && <Player {...playerProps} />}
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
         {episodesQuery.isError && <p>Error</p>}
-        {episodeQuery.isSuccess && episodes.length === 0 && (
+        {serversQuery.isSuccess && episodes.length === 0 && (
           <p>No episodes are out yet.</p>
         )}
         {episodes.length !== 0 && <EpisodesGrid {...episodesGridProps} />}
