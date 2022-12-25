@@ -83,6 +83,8 @@ const Home = () => {
       toast.error("Error");
     }
   };
+  console.log(idx.current);
+  console.log(selectedVideo);
 
   const episodesGridProps = {
     episodes,
