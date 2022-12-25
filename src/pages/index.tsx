@@ -77,14 +77,13 @@ const Home = () => {
       });
       title.current = episode.name;
       selectedEpisode.current = episode.path;
+      console.log(videos.data);
       setVideos(videos.data);
       setSelectedVideo(videos.data?.[idx.current]);
     } catch {
       toast.error("Error");
     }
   };
-  console.log(idx.current);
-  console.log(selectedVideo);
 
   const episodesGridProps = {
     episodes,
@@ -143,7 +142,7 @@ const Home = () => {
         {/* video player */}
         {episodeQuery.isLoading && <Spinner />}
         {episodeQuery.isError && <p>Error</p>}
-        {hasWindow && videos && (
+        {hasWindow && !corsError && videos && (
           <section className="space-y-2">
             <p className="text-lg">{title.current}</p>
             <ReactPlayer
@@ -152,15 +151,14 @@ const Home = () => {
               controls
               playing
               url={selectedVideo}
-              onPlay={() => {
-                setCorsError(false);
-              }}
               onError={(err) => {
                 if (err !== "hlsError") return;
                 if (idx.current === videos.length - 1) {
                   setCorsError(true);
                   return;
                 }
+                console.log(selectedVideo);
+                console.log(idx.current);
                 idx.current += 1;
                 setSelectedVideo(videos[idx.current]);
               }}
@@ -190,10 +188,7 @@ const Home = () => {
             {shows.map((show, i) => (
               <div
                 key={i}
-                className={`cursor-pointer space-y-2 transition-transform duration-200 ease-out hover:scale-105 ${
-                  selectedShow.current === show.path &&
-                  "scale-105 border-b-2 border-indigo-600"
-                }`}
+                className={`cursor-pointer space-y-2 transition-transform duration-200 ease-out hover:scale-105`}
                 onClick={async () => {
                   try {
                     const videos = await episodesQuery.mutateAsync({
