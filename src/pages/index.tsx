@@ -13,7 +13,7 @@ import EpisodesGrid from "../components/EpisodesGrid";
 const Home = () => {
   const [text, setText] = useState("");
   const [isDrama, setIsDrama] = useState(false);
-  const [url, setUrl] = useState("");
+  const [videos, setVideos] = useState<string[] | string>();
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
@@ -22,6 +22,9 @@ const Home = () => {
   const selectedShow = useRef("");
   const selectedEpisode = useRef("");
   const title = useRef("");
+  const idx = useRef(0);
+  const [selectedVideo, setSelectedVideo] = useState<string>();
+  const [corsError, setCorsError] = useState(false);
 
   // trpc queries
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 3 });
@@ -29,10 +32,8 @@ const Home = () => {
   const episodeQuery = trpc.fetcher.episode.useMutation({ retry: 3 });
 
   const debounceText = useDebouncer(text);
-  useEffect(() => {
-    if (debounceText === "") {
-      return;
-    }
+
+  const reset = () => {
     searchQuery.reset();
     episodesQuery.reset();
     episodeQuery.reset();
@@ -42,6 +43,13 @@ const Home = () => {
     setSelectedPagination(1);
     setEpisodes([]);
     setShows([]);
+  };
+
+  useEffect(() => {
+    if (debounceText === "") {
+      return;
+    }
+    reset();
     const fetchShows = async () => {
       try {
         const videos = await searchQuery.mutateAsync({
@@ -63,16 +71,27 @@ const Home = () => {
 
   const handleSelectEpisode = async (episode: Show) => {
     try {
-      const url = await episodeQuery.mutateAsync({
+      const videos = await episodeQuery.mutateAsync({
         path: episode.path,
         type: isDrama ? "drama" : "anime",
       });
       title.current = episode.name;
       selectedEpisode.current = episode.path;
-      setUrl(url.data ?? "");
+      setVideos(videos.data);
+      setSelectedVideo(videos.data?.[idx.current]);
     } catch {
       toast.error("Error");
     }
+  };
+
+  const episodesGridProps = {
+    episodes,
+    handleSelectEpisode,
+    selectedEpisode,
+    selectedPagination,
+    setSelectedPagination,
+    columns,
+    setColumns,
   };
 
   return (
@@ -118,14 +137,11 @@ const Home = () => {
             Korean Drama
           </button>
         </div>
-        <p className="text-sm">
-          Some of the animes cannot be played. Currently fixing it.
-        </p>
 
         {/* video player */}
         {episodeQuery.isLoading && <Spinner />}
         {episodeQuery.isError && <p>Error</p>}
-        {hasWindow && url && (
+        {hasWindow && videos && (
           <section className="space-y-2">
             <p className="text-lg">{title.current}</p>
             <ReactPlayer
@@ -133,10 +149,23 @@ const Home = () => {
               height="auto"
               controls
               playing
-              url={url}
+              url={selectedVideo}
+              onPlay={() => {
+                setCorsError(false);
+              }}
+              onError={(err) => {
+                if (err !== "hlsError") return;
+                if (idx.current === videos.length - 1) {
+                  setCorsError(true);
+                  return;
+                }
+                idx.current += 1;
+                setSelectedVideo(videos[idx.current]);
+              }}
             />
           </section>
         )}
+        {corsError && <p>No video can be played</p>}
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
@@ -146,15 +175,7 @@ const Home = () => {
         )}
         {episodes.length !== 0 && (
           <section>
-            <EpisodesGrid
-              episodes={episodes}
-              handleSelectEpisode={handleSelectEpisode}
-              selectedEpisode={selectedEpisode}
-              selectedPagination={selectedPagination}
-              setSelectedPagination={setSelectedPagination}
-              columns={columns}
-              setColumns={setColumns}
-            />
+            <EpisodesGrid {...episodesGridProps} />
           </section>
         )}
 
@@ -168,7 +189,8 @@ const Home = () => {
               <div
                 key={i}
                 className={`cursor-pointer space-y-2 transition-transform duration-200 ease-out hover:scale-105 ${
-                  selectedShow.current === show.path && "scale-105"
+                  selectedShow.current === show.path &&
+                  "scale-105 border-b-2 border-indigo-600"
                 }`}
                 onClick={async () => {
                   try {
@@ -193,14 +215,7 @@ const Home = () => {
                   alt="banner"
                 />
 
-                <p
-                  className={`text-center text-xs ${
-                    selectedShow.current === show.path &&
-                    "underline decoration-indigo-600 decoration-[3px] underline-offset-2"
-                  }`}
-                >
-                  {show.name}
-                </p>
+                <p className={`text-center text-xs`}>{show.name}</p>
               </div>
             ))}
           </section>
