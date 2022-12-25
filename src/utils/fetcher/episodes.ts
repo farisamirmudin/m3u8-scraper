@@ -1,8 +1,8 @@
 import { load } from "cheerio";
 import { Show } from "../../../typings";
 
-export const episodes = async (path: string, type: string) => {
-  if (type === "drama") {
+export const episodes = async (path: string, drama: boolean) => {
+  if (drama) {
     const res = await fetch(process.env.NEXT_PUBLIC_DRAMA_BASE_URL + path);
     const html = await res.text();
     const $ = load(html);

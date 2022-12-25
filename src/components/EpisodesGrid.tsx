@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useState,
   useRef,
   MutableRefObject,
   Dispatch,
@@ -69,7 +68,7 @@ const EpisodesGrid = ({
   };
 
   return (
-    <>
+    <section>
       <div
         ref={gridRef}
         style={{
@@ -112,7 +111,7 @@ const EpisodesGrid = ({
           </button>
         </section>
       )}
-    </>
+    </section>
   );
 };
 export default EpisodesGrid;
