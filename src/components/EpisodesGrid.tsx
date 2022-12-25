@@ -18,7 +18,7 @@ interface Props {
   setColumns: Dispatch<SetStateAction<number>>;
 }
 
-const EpisodesGrid: React.FC<Props> = ({
+const EpisodesGrid = ({
   episodes,
   handleSelectEpisode,
   selectedEpisode,
@@ -26,7 +26,7 @@ const EpisodesGrid: React.FC<Props> = ({
   setSelectedPagination,
   columns,
   setColumns,
-}) => {
+}: Props) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const buttonWidth = 60;
   const gap = 24;
@@ -75,7 +75,6 @@ const EpisodesGrid: React.FC<Props> = ({
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${columns}, minmax(${buttonWidth}px, 1fr))`,
-          // gridTemplateRows: `repeat(${rows.current}, 1fr)`,
           gap: `${gap}px`,
           paddingTop: "16px",
         }}
