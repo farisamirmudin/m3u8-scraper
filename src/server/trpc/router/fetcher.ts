@@ -1,30 +1,30 @@
 import { z } from "zod";
-import { episode } from "../../../utils/episode";
-import { episodes } from "../../../utils/episodes";
-import { search } from "../../../utils/search";
+import { getServers } from "../../../utils/fetcher/getServers";
+import { getEpisodes } from "../../../utils/fetcher/getEpisodes";
+import { search } from "../../../utils/fetcher/search";
 
 import { router, publicProcedure } from "../trpc";
 
 export const fetcherRouter = router({
   search: publicProcedure
-    .input(z.object({ text: z.string() }))
+    .input(z.object({ text: z.string(), drama: z.boolean() }))
     .mutation(async ({ input }) => {
       return {
-        data: await search(input.text),
+        data: await search(input.text, input.drama),
       };
     }),
-  episodes: publicProcedure
-    .input(z.object({ path: z.string() }))
+  getEpisodes: publicProcedure
+    .input(z.object({ path: z.string(), drama: z.boolean() }))
     .mutation(async ({ input }) => {
       return {
-        data: await episodes(input.path),
+        data: await getEpisodes(input.path, input.drama),
       };
     }),
-  episode: publicProcedure
-    .input(z.object({ path: z.string() }))
+  getServers: publicProcedure
+    .input(z.object({ path: z.string(), drama: z.boolean() }))
     .mutation(async ({ input }) => {
       return {
-        data: await episode(input.path),
+        data: await getServers(input.path, input.drama),
       };
     }),
 });
