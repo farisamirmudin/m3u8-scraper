@@ -94,17 +94,17 @@ const EpisodesGrid = ({
 
       {/* pagination */}
       {totalPagination.current > 1 && (
-        <section className="flex justify-center gap-4 py-4">
+        <section className="flex justify-center gap-8 py-4">
           <button
             disabled={selectedPagination === 1}
-            className="text-xl enabled:hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="text-2xl enabled:hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => handleChangePagination("<")}
           >
             {"<"}
           </button>
           <button
             disabled={selectedPagination === totalPagination.current}
-            className="text-xl enabled:hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="text-2xl enabled:hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => handleChangePagination(">")}
           >
             {">"}
