@@ -14,7 +14,7 @@ import SearchBar from "../components/SearchBar";
 
 const Home = () => {
   const [text, setText] = useState("");
-  const [isDrama, setIsDrama] = useState(false);
+  const [isDrama, setIsDrama] = useState(true);
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
@@ -48,9 +48,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (debounceText === "") {
-      return;
-    }
+    if (debounceText === "") return;
     reset();
     const fetchShows = async () => {
       try {
@@ -134,7 +132,7 @@ const Home = () => {
       <Toaster position="bottom-center" />
       <Head>
         <title>T3 Watch</title>
-        <meta name="description" content="Watch Anime or Korean Drama" />
+        <meta name="description" content="Watch Korean Drama" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="mx-auto min-h-screen max-w-sm space-y-4 p-6 md:max-w-2xl lg:max-w-4xl">
@@ -146,7 +144,7 @@ const Home = () => {
         <SearchBar text={text} setText={setText} />
 
         {/* options */}
-        <SelectOption isDrama={isDrama} setIsDrama={setIsDrama} />
+        {/* <SelectOption isDrama={isDrama} setIsDrama={setIsDrama} /> */}
 
         {/* video player */}
         {serversQuery.isLoading && <Spinner />}
@@ -158,7 +156,7 @@ const Home = () => {
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
         {episodesQuery.isError && <p>Error</p>}
-        {serversQuery.isSuccess && episodes.length === 0 && (
+        {episodesQuery.isSuccess && episodes.length === 0 && (
           <p>No episodes are out yet.</p>
         )}
         {episodes.length !== 0 && <EpisodesGrid {...episodesGridProps} />}
