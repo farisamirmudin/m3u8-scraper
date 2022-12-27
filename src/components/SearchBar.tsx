@@ -13,7 +13,7 @@ const SearchBar = ({
       onChange={(e) => setText(e.target.value)}
       className="w-full border-b-2 border-indigo-600 bg-transparent py-1 placeholder-slate-400 outline-none"
       type="text"
-      placeholder="Search Korean Drama..."
+      placeholder="Search Drama..."
     />
   );
 };
