@@ -131,13 +131,13 @@ const Home = () => {
     <>
       <Toaster position="bottom-center" />
       <Head>
-        <title>T3 Watch</title>
+        <title>Alchemy</title>
         <meta name="description" content="Watch Korean Drama" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.svg" />
       </Head>
-      <main className="mx-auto min-h-screen max-w-sm space-y-4 p-6 md:max-w-2xl lg:max-w-4xl">
+      <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
         <p className="text-5xl font-bold">
-          <span className="text-indigo-600">T3</span> Watch
+          <span className="text-indigo-600">Al</span>chemy
         </p>
 
         {/* searchbar */}
