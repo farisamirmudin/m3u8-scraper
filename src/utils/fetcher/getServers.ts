@@ -18,7 +18,6 @@ export const getServers = async (path: string, drama: boolean) => {
     res = await fetch(process.env.NEXT_PUBLIC_DRAMA_AJAX_URL + "?id=" + encId, {
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/x-www-form-urlencoded",
       },
     });
 
@@ -36,12 +35,6 @@ export const getServers = async (path: string, drama: boolean) => {
   res = await fetch("https:" + streaming);
   html = await res.text();
   $ = load(html);
-  // const serverwithtoken = $(`li[data-provider="serverwithtoken"]`).attr(
-  //   "data-video"
-  // );
-  // res = await fetch(serverwithtoken!);
-  // html = await res.text();
-  // $ = load(html);
   const data = $(`script[data-name="episode"]`).attr("data-value") ?? "";
   const id = $("input#id").attr("value") ?? "";
   const secretKey = $("body").attr("class")?.split("-")[1];
@@ -72,7 +65,6 @@ export const getServers = async (path: string, drama: boolean) => {
   const source = decrypt(encSource.data, secondKey, iv);
   const pattern = /(https.+?m3u8)/g;
   const links = source.match(pattern)?.toString();
-  // console.log(source);
   const linksSet = new Set(links?.split(","));
   return [...linksSet];
 };

@@ -7,7 +7,6 @@ import { useDebouncer } from "../utils/debouncerHook";
 import { Show } from "../../typings";
 import Spinner from "../components/Spinner";
 import EpisodesGrid from "../components/EpisodesGrid";
-import SelectOption from "../components/SelectOption";
 import Player from "../components/Player";
 import DisplayShow from "../components/DisplayShow";
 import SearchBar from "../components/SearchBar";
@@ -133,7 +132,7 @@ const Home = () => {
       <Head>
         <title>Alchemy</title>
         <meta name="description" content="Watch Korean Drama" />
-        <link rel="icon" href="/logo.svg" />
+        <link rel="icon" href="/alogo.svg" />
       </Head>
       <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
         <p className="text-5xl font-bold">
