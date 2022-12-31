@@ -1,25 +1,27 @@
 import { load } from "cheerio";
 import { decrypt, encrypt } from "../cipher";
 
-export const getServers = async (path: string, drama: boolean) => {
-  if (drama) {
-    const key = process.env.NEXT_PUBLIC_DRAMA_SECRET_KEY;
-    const iv = process.env.NEXT_PUBLIC_DRAMA_IV;
-    let res = await fetch(process.env.NEXT_PUBLIC_DRAMA_BASE_URL + path);
+export const getServers = async (path: string, isDrama: boolean) => {
+  if (isDrama) {
+    const key = "93422192433952489752342908585752";
+    const iv = "9262859232435825";
+    let res = await fetch("http://asianplay.net" + path);
     const html = await res.text();
     const $ = load(html);
 
     const streaming = $("iframe").attr("src") ?? "";
     const id = new URL("https:" + streaming).searchParams.get("id");
-
-    if (!key || !iv) return [];
     const encId = encrypt(id!, key, iv);
 
-    res = await fetch(process.env.NEXT_PUBLIC_DRAMA_AJAX_URL + "?id=" + encId, {
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-      },
-    });
+    res = await fetch(
+      "https://asianplay.net/encrypt-ajax.php" + "?id=" + encId,
+      {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     const encSource: { data: string } = await res.json();
     const source = decrypt(encSource.data, key, iv);
@@ -28,7 +30,7 @@ export const getServers = async (path: string, drama: boolean) => {
     const linksSet = new Set(links?.split(","));
     return [...linksSet];
   }
-  let res = await fetch(process.env.NEXT_PUBLIC_ANIME_BASE_URL + path.trim());
+  let res = await fetch("https://gogoanime.tel" + path.trim());
   let html = await res.text();
   let $ = load(html);
   const streaming = $("iframe").attr("src") ?? "";
@@ -49,11 +51,7 @@ export const getServers = async (path: string, drama: boolean) => {
   const encId = encrypt(id, secretKey, iv);
 
   res = await fetch(
-    process.env.NEXT_PUBLIC_ANIME_AJAX_URL +
-      "?id=" +
-      encId +
-      "&alias=" +
-      params,
+    "https://gogohd.pro/encrypt-ajax.php?id=" + encId + "&alias=" + params,
     {
       method: "POST",
       headers: {

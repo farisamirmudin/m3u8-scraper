@@ -1,9 +1,9 @@
 import { load } from "cheerio";
 import { Show } from "../../../typings";
 
-export const getEpisodes = async (path: string, drama: boolean) => {
-  if (drama) {
-    const res = await fetch(process.env.NEXT_PUBLIC_DRAMA_BASE_URL + path);
+export const getEpisodes = async (path: string, isDrama: boolean) => {
+  if (isDrama) {
+    const res = await fetch("http://asianplay.net" + path);
     const html = await res.text();
     const $ = load(html);
     const episodes: Show[] = [];
@@ -15,7 +15,7 @@ export const getEpisodes = async (path: string, drama: boolean) => {
     });
     return episodes;
   }
-  let res = await fetch(process.env.NEXT_PUBLIC_ANIME_BASE_URL + path);
+  let res = await fetch("https://gogoanime.tel" + path);
   let html = await res.text();
   let $ = load(html);
   const title = $("div.anime_info_body_bg h1").text().trim();

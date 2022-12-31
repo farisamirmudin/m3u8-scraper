@@ -1,9 +1,9 @@
 import { load } from "cheerio";
 import { Show } from "../../../typings";
 
-export const search = async (text: string, drama: boolean) => {
-  if (drama) {
-    const res = await fetch(process.env.NEXT_PUBLIC_DRAMA_SEARCH_URL + text);
+export const search = async (text: string, isDrama: boolean) => {
+  if (isDrama) {
+    const res = await fetch("http://asianplay.net/search.html?keyword=" + text);
     const html = await res.text();
     const $ = load(html);
     const video: Show[] = [];
@@ -15,7 +15,7 @@ export const search = async (text: string, drama: boolean) => {
     });
     return video;
   }
-  const res = await fetch(process.env.NEXT_PUBLIC_ANIME_SEARCH_URL + text);
+  const res = await fetch("https://gogoanime.tel/search.html?keyword=" + text);
   const html = await res.text();
   const $ = load(html);
   const video: Show[] = [];
