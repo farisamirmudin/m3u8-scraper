@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import { Show } from "../../typings";
 
 import { FC } from "react";
 

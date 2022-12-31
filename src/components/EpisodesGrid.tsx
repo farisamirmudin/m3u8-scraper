@@ -5,7 +5,6 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
-import { Show } from "../../typings";
 
 interface Props {
   episodes: Show[];
