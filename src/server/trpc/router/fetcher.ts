@@ -7,24 +7,24 @@ import { router, publicProcedure } from "../trpc";
 
 export const fetcherRouter = router({
   search: publicProcedure
-    .input(z.object({ text: z.string(), drama: z.boolean() }))
+    .input(z.object({ text: z.string() }))
     .mutation(async ({ input }) => {
       return {
-        data: await search(input.text, input.drama),
+        data: await search(input.text),
       };
     }),
   getEpisodes: publicProcedure
-    .input(z.object({ path: z.string(), drama: z.boolean() }))
+    .input(z.object({ path: z.string() }))
     .mutation(async ({ input }) => {
       return {
-        data: await getEpisodes(input.path, input.drama),
+        data: await getEpisodes(input.path),
       };
     }),
   getServers: publicProcedure
-    .input(z.object({ path: z.string(), drama: z.boolean() }))
+    .input(z.object({ path: z.string() }))
     .mutation(async ({ input }) => {
       return {
-        data: await getServers(input.path, input.drama),
+        data: await getServers(input.path),
       };
     }),
 });

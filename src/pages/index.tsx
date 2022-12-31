@@ -13,7 +13,6 @@ import SearchBar from "../components/SearchBar";
 
 const Home = () => {
   const [text, setText] = useState("");
-  const [isDrama, setIsDrama] = useState(true);
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
@@ -28,13 +27,17 @@ const Home = () => {
   const [corsError, setCorsError] = useState(false);
 
   // trpc queries
-  const searchQuery = trpc.fetcher.search.useMutation({ retry: 3 });
-  const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 3 });
-  const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 3 });
+  const searchQuery = trpc.fetcher.search.useMutation({ retry: 5 });
+  const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 5 });
+  const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 5 });
 
   const debounceText = useDebouncer(text);
 
   const reset = () => {
+    if (corsError) {
+      setSelectedServer(undefined);
+      setCorsError(false);
+    }
     searchQuery.reset();
     episodesQuery.reset();
     serversQuery.reset();
@@ -53,7 +56,6 @@ const Home = () => {
       try {
         const shows = await searchQuery.mutateAsync({
           text: debounceText,
-          drama: isDrama,
         });
         setShows(shows.data);
       } catch {
@@ -72,7 +74,6 @@ const Home = () => {
     try {
       const servers = await serversQuery.mutateAsync({
         path: episode.path,
-        drama: isDrama,
       });
       title.current = episode.name;
       selectedEpisode.current = episode.path;
@@ -89,7 +90,6 @@ const Home = () => {
     try {
       const episodes = await episodesQuery.mutateAsync({
         path: show.path,
-        drama: isDrama,
       });
       selectedShow.current = show.path;
       setSelectedPagination(1);
@@ -151,6 +151,7 @@ const Home = () => {
         {hasWindow && !corsError && serversRef.current && (
           <Player {...playerProps} />
         )}
+        {corsError && <p>CORS Error</p>}
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
