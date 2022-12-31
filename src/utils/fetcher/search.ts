@@ -1,5 +1,4 @@
 import { load } from "cheerio";
-import { Show } from "../../../typings";
 
 export const search = async (keyword: string) => {
   const res = await fetch(

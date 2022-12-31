@@ -1,5 +1,4 @@
 import { load } from "cheerio";
-import { Show } from "../../../typings";
 
 export const getEpisodes = async (path: string) => {
   const res = await fetch(`http://asianplay.net${path}`);
