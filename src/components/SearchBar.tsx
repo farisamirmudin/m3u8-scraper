@@ -1,12 +1,11 @@
 import React, { Dispatch, SetStateAction } from "react";
+import { FC } from "react";
 
-const SearchBar = ({
-  text,
-  setText,
-}: {
+interface SearchBarProps {
   text: string;
   setText: Dispatch<SetStateAction<string>>;
-}) => {
+}
+const SearchBar: FC<SearchBarProps> = ({ text, setText }) => {
   return (
     <input
       value={text}

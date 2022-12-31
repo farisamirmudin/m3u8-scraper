@@ -88,7 +88,7 @@ const EpisodesGrid = ({
                 "border-[2px] border-indigo-600"
               } rounded-md bg-slate-800 py-2 text-xs transition-transform duration-200 ease-out hover:scale-105`}
               key={i}
-            >{`EP ${episode.name.split(" ").at(-1)}`}</button>
+            >{`EP ${episode.title.split(" ").at(-1)}`}</button>
           ))}
       </div>
 

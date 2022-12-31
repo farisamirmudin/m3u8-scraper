@@ -1,25 +1,16 @@
-import React, { MutableRefObject } from "react";
 import ReactPlayer from "react-player";
+import { FC } from "react";
 
-const Player = ({
-  title,
-  selectedServer,
-  playerError,
-}: {
-  title: MutableRefObject<string>;
-  selectedServer: string | undefined;
-  playerError: (error: any) => void;
-}) => {
+const Player: FC<PlayerProps> = ({ title, servers }) => {
   return (
     <section className="space-y-2">
-      <p className="text-lg">{title.current}</p>
+      <p className="text-lg">{title}</p>
       <ReactPlayer
         width="100%"
         height="auto"
         controls
-        playing
-        url={selectedServer}
-        onError={(error) => playerError(error)}
+        playsinline
+        url={servers[0]}
       />
     </section>
   );

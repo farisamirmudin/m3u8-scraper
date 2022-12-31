@@ -9,8 +9,8 @@ export const getEpisodes = async (path: string) => {
   $("ul.listing.items.lists li").each((_, el) => {
     const path = $(el).find("a").attr("href")?.trim() ?? "";
     const img = $(el).find(".picture img").attr("src")?.trim() ?? "";
-    const name = $(el).find(".name").text().trim() ?? "";
-    episodes.push({ name, path, img });
+    const title = $(el).find(".name").text().trim() ?? "";
+    episodes.push({ title, path, img });
   });
   return episodes;
 };

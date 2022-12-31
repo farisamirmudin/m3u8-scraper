@@ -5,8 +5,8 @@ export const getServers = async (path: string) => {
   const key = "93422192433952489752342908585752";
   const iv = "9262859232435825";
   let res = await fetch(`http://asianplay.net${path}`);
-  const html = await res.text();
-  const $ = load(html);
+  let html = await res.text();
+  let $ = load(html);
 
   const streaming = $("iframe").attr("src") ?? "";
   const id = new URL("https:" + streaming).searchParams.get("id");
@@ -20,8 +20,6 @@ export const getServers = async (path: string) => {
 
   const encSource = await res.json();
   const source = decrypt(encSource.data, key, iv);
-  const pattern = /(https.+?m3u8)/g;
-  const links = source.match(pattern)?.toString();
-  const linksSet = new Set(links?.split(","));
-  return [...linksSet];
+  const links = source.match(/(https.+?m3u8)/g);
+  return links;
 };

@@ -1,12 +1,10 @@
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import { trpc } from "../utils/trpc";
 import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
-import { Show } from "../../typings";
 import Spinner from "../components/Spinner";
-import EpisodesGrid from "../components/EpisodesGrid";
 import Player from "../components/Player";
 import DisplayShow from "../components/DisplayShow";
 import SearchBar from "../components/SearchBar";
@@ -16,15 +14,7 @@ const Home = () => {
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
-  const [selectedPagination, setSelectedPagination] = useState(1);
-  const [columns, setColumns] = useState(0);
-  const selectedShow = useRef("");
-  const selectedEpisode = useRef("");
-  const title = useRef("");
-  const selectedServerRef = useRef(0);
-  const serversRef = useRef<string[]>([]);
-  const [selectedServer, setSelectedServer] = useState<string>();
-  const [corsError, setCorsError] = useState(false);
+  const [playerProp, setPlayerProp] = useState<PlayerProps>();
 
   // trpc queries
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 5 });
@@ -34,17 +24,9 @@ const Home = () => {
   const debounceText = useDebouncer(text);
 
   const reset = () => {
-    if (corsError) {
-      setSelectedServer(undefined);
-      setCorsError(false);
-    }
     searchQuery.reset();
     episodesQuery.reset();
     serversQuery.reset();
-    selectedShow.current = "";
-    selectedEpisode.current = "";
-    setColumns(0);
-    setSelectedPagination(1);
     setEpisodes([]);
     setShows([]);
   };
@@ -70,17 +52,14 @@ const Home = () => {
     setHasWindow(true);
   }, []);
 
-  const handleSelectEpisode = async (episode: Show) => {
+  const handleSelectEpisode = async (e: ChangeEvent<HTMLSelectElement>) => {
+    const episode = episodes[parseInt(e.target.value)];
+    if (!episode) return;
     try {
       const servers = await serversQuery.mutateAsync({
         path: episode.path,
       });
-      title.current = episode.name;
-      selectedEpisode.current = episode.path;
-      selectedServerRef.current = 0;
-      serversRef.current = servers.data;
-      setSelectedServer(serversRef.current[selectedServerRef.current]);
-      setCorsError(false);
+      setPlayerProp({ title: episode.title, servers: servers.data! });
     } catch {
       toast.error("Error");
     }
@@ -91,41 +70,11 @@ const Home = () => {
       const episodes = await episodesQuery.mutateAsync({
         path: show.path,
       });
-      selectedShow.current = show.path;
-      setSelectedPagination(1);
-      setColumns(0);
       setEpisodes(episodes.data);
     } catch {
       toast.error("Error");
     }
   };
-
-  const episodesGridProps = {
-    episodes,
-    handleSelectEpisode,
-    selectedEpisode,
-    selectedPagination,
-    setSelectedPagination,
-    columns,
-    setColumns,
-  };
-
-  const playerError = (error: any) => {
-    if (error !== "hlsError") return;
-    if (selectedServerRef.current === serversRef.current.length - 1) {
-      setCorsError(true);
-      return;
-    }
-    selectedServerRef.current += 1;
-    setSelectedServer(serversRef.current[selectedServerRef.current]);
-  };
-
-  const playerProps = {
-    title,
-    selectedServer,
-    playerError,
-  };
-
   return (
     <>
       <Toaster position="bottom-center" />
@@ -142,24 +91,33 @@ const Home = () => {
         {/* searchbar */}
         <SearchBar text={text} setText={setText} />
 
-        {/* options */}
-        {/* <SelectOption isDrama={isDrama} setIsDrama={setIsDrama} /> */}
-
         {/* video player */}
         {serversQuery.isLoading && <Spinner />}
         {serversQuery.isError && <p>Error</p>}
-        {hasWindow && !corsError && serversRef.current && (
-          <Player {...playerProps} />
-        )}
-        {corsError && <p>CORS Error</p>}
+        {hasWindow && playerProp && <Player {...playerProp} />}
 
         {/* episodes */}
         {episodesQuery.isLoading && <Spinner />}
         {episodesQuery.isError && <p>Error</p>}
         {episodesQuery.isSuccess && episodes.length === 0 && (
-          <p>No episodes are out yet.</p>
+          <p>No episodes are available.</p>
         )}
-        {episodes.length !== 0 && <EpisodesGrid {...episodesGridProps} />}
+        {episodes.length !== 0 && (
+          <>
+            <label>Select Episode:</label>
+            <select
+              className="mx-2 border-b-2 border-indigo-600 bg-transparent pr-2 outline-none"
+              onChange={(e) => handleSelectEpisode(e)}
+            >
+              <option></option>
+              {episodes.map((episode, i) => (
+                <option key={i} value={i}>
+                  {episode.title.split(" ").at(-1)}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
 
         {/* shows */}
         {searchQuery.isLoading && <Spinner />}
