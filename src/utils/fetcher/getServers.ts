@@ -5,8 +5,8 @@ export const getServers = async (path: string) => {
   const key = "93422192433952489752342908585752";
   const iv = "9262859232435825";
   let res = await fetch(`https://asianplay.net${path}`);
-  let html = await res.text();
-  let $ = load(html);
+  const html = await res.text();
+  const $ = load(html);
 
   const streaming = $("iframe").attr("src") ?? "";
   const id = new URL("https:" + streaming).searchParams.get("id") ?? "";
