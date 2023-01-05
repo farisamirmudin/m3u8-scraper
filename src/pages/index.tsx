@@ -15,6 +15,7 @@ const Home = () => {
   const [episodes, setEpisodes] = useState<Show[]>([]);
   const [hasWindow, setHasWindow] = useState(false);
   const [playerProp, setPlayerProp] = useState<PlayerProps>();
+  const [queryError, setQueryError] = useState(false);
 
   // trpc queries
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 5 });
@@ -29,6 +30,7 @@ const Home = () => {
     serversQuery.reset();
     setEpisodes([]);
     setShows([]);
+    setQueryError(false);
   };
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const Home = () => {
         });
         setShows(shows.data);
       } catch {
-        console.error("Error");
+        setQueryError(true);
       }
     };
     fetchShows();
@@ -61,7 +63,7 @@ const Home = () => {
       });
       setPlayerProp({ title: episode.title, servers: servers.data! });
     } catch {
-      console.error("Error");
+      setQueryError(true);
     }
   };
 
@@ -72,7 +74,7 @@ const Home = () => {
       });
       setEpisodes(episodes.data);
     } catch {
-      console.error("Error");
+      setQueryError(true);
     }
   };
   return (
@@ -97,7 +99,7 @@ const Home = () => {
           )}
           {episodes.length !== 0 && (
             <select
-              className="appearance-none rounded-full bg-gray-400 px-2 text-center text-gray-600 outline-none"
+              className="w-14 appearance-none rounded-full bg-gray-400 text-center text-gray-600 outline-none"
               onChange={(e) => handleSelectEpisode(e)}
             >
               <option>EP</option>
@@ -115,7 +117,8 @@ const Home = () => {
             episodesQuery.isLoading) && <Spinner />}
           {(serversQuery.isError ||
             episodesQuery.isError ||
-            searchQuery.isError) && <Error />}
+            searchQuery.isError ||
+            queryError) && <Error />}
         </div>
 
         {/* video player */}
