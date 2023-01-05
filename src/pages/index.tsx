@@ -103,7 +103,7 @@ const Home = () => {
               <option>EP</option>
               {episodes.map((episode, i) => (
                 <option key={i} value={i}>
-                  EP {episode.title.split(" ").at(-1)}
+                  {episode.title.split(" ").at(-1)}
                 </option>
               ))}
             </select>
