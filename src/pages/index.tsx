@@ -2,12 +2,12 @@ import Head from "next/head";
 import { ChangeEvent, useEffect, useState } from "react";
 
 import { trpc } from "../utils/trpc";
-import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
 import Spinner from "../components/Spinner";
 import Player from "../components/Player";
 import DisplayShow from "../components/DisplayShow";
 import SearchBar from "../components/SearchBar";
+import Error from "../components/Error";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -41,7 +41,7 @@ const Home = () => {
         });
         setShows(shows.data);
       } catch {
-        toast.error("Error");
+        console.error("Error");
       }
     };
     fetchShows();
@@ -61,7 +61,7 @@ const Home = () => {
       });
       setPlayerProp({ title: episode.title, servers: servers.data! });
     } catch {
-      toast.error("Error");
+      console.error("Error");
     }
   };
 
@@ -72,56 +72,56 @@ const Home = () => {
       });
       setEpisodes(episodes.data);
     } catch {
-      toast.error("Error");
+      console.error("Error");
     }
   };
   return (
     <>
-      <Toaster position="bottom-center" />
       <Head>
         <title>Alchemy</title>
         <meta name="description" content="Watch Korean Drama" />
         <link rel="icon" href="/alogo.svg" />
       </Head>
       <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
-        <p className="text-5xl font-bold">
+        <p className="text-5xl font-light">
           <span className="text-indigo-600">Al</span>chemy
         </p>
 
-        {/* searchbar */}
-        <SearchBar text={text} setText={setText} />
+        <div className="flex h-6 gap-4">
+          {/* searchbar */}
+          <SearchBar text={text} setText={setText} />
 
-        {/* video player */}
-        {serversQuery.isLoading && <Spinner />}
-        {serversQuery.isError && <p>Error</p>}
-        {hasWindow && playerProp && <Player {...playerProp} />}
-
-        {/* episodes */}
-        {episodesQuery.isLoading && <Spinner />}
-        {episodesQuery.isError && <p>Error</p>}
-        {episodesQuery.isSuccess && episodes.length === 0 && (
-          <p>No episodes are available.</p>
-        )}
-        {episodes.length !== 0 && (
-          <>
-            <label>Select Episode:</label>
+          {/* episodes */}
+          {episodesQuery.isSuccess && episodes.length === 0 && (
+            <p>No episodes are available.</p>
+          )}
+          {episodes.length !== 0 && (
             <select
-              className="mx-2 border-b-2 border-indigo-600 bg-transparent pr-2 outline-none"
+              className="appearance-none rounded-full bg-gray-400 px-2 text-center text-gray-600 outline-none"
               onChange={(e) => handleSelectEpisode(e)}
             >
-              <option></option>
+              <option>EP</option>
               {episodes.map((episode, i) => (
                 <option key={i} value={i}>
-                  {episode.title.split(" ").at(-1)}
+                  EP {episode.title.split(" ").at(-1)}
                 </option>
               ))}
             </select>
-          </>
-        )}
+          )}
+
+          {/* handling error and loading */}
+          {(searchQuery.isLoading ||
+            serversQuery.isLoading ||
+            episodesQuery.isLoading) && <Spinner />}
+          {(serversQuery.isError ||
+            episodesQuery.isError ||
+            searchQuery.isError) && <Error />}
+        </div>
+
+        {/* video player */}
+        {hasWindow && playerProp && <Player {...playerProp} />}
 
         {/* shows */}
-        {searchQuery.isLoading && <Spinner />}
-        {searchQuery.isError && <p>Error</p>}
         {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
         {shows.length !== 0 && (
           <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
