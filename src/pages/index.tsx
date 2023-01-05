@@ -99,7 +99,7 @@ const Home = () => {
           )}
           {episodes.length !== 0 && (
             <select
-              className="appearance-none rounded-full bg-gray-400 px-3 text-center text-gray-600 outline-none"
+              className="appearance-none rounded-full bg-gray-400 px-3 text-gray-600 outline-none"
               onChange={(e) => handleSelectEpisode(e)}
             >
               <option>EP</option>
