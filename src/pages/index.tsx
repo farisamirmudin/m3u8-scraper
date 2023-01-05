@@ -89,7 +89,7 @@ const Home = () => {
           <span className="text-indigo-600">Al</span>chemy
         </p>
 
-        <div className="flex h-6 gap-4">
+        <div className="flex h-6 items-center gap-4">
           {/* searchbar */}
           <SearchBar text={text} setText={setText} />
 
@@ -99,7 +99,7 @@ const Home = () => {
           )}
           {episodes.length !== 0 && (
             <select
-              className="w-14 appearance-none rounded-full bg-gray-400 text-center text-gray-600 outline-none"
+              className="appearance-none rounded-full bg-gray-400 px-3 text-center text-gray-600 outline-none"
               onChange={(e) => handleSelectEpisode(e)}
             >
               <option>EP</option>
