@@ -1,4 +1,4 @@
-const Error = () => {
+const ErrorComp = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -17,4 +17,4 @@ const Error = () => {
   );
 };
 
-export default Error;
+export default ErrorComp;

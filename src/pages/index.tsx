@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { trpc } from "../utils/trpc";
 import { useDebouncer } from "../utils/debouncerHook";
@@ -7,7 +7,8 @@ import Spinner from "../components/Spinner";
 import Player from "../components/Player";
 import DisplayShow from "../components/DisplayShow";
 import SearchBar from "../components/SearchBar";
-import Error from "../components/Error";
+import ErrorComp from "../components/ErrorComp";
+import EpisodeSelection from "../components/EpisodeSelection";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -54,8 +55,8 @@ const Home = () => {
     setHasWindow(true);
   }, []);
 
-  const handleSelectEpisode = async (e: ChangeEvent<HTMLSelectElement>) => {
-    const episode = episodes[parseInt(e.target.value)];
+  const handleSelectEpisode = async (i: number) => {
+    const episode = episodes[i];
     if (!episode) return;
     try {
       const servers = await serversQuery.mutateAsync({
@@ -85,11 +86,11 @@ const Home = () => {
         <link rel="icon" href="/alogo.svg" />
       </Head>
       <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
-        <p className="text-5xl font-light">
-          <span className="text-indigo-600">Al</span>chemy
+        <p className="text-4xl font-light">
+          <span className="text-indigo-500">Alchemy</span>Watch
         </p>
 
-        <div className="flex h-6 items-center gap-4">
+        <div className="flex items-center gap-4">
           {/* searchbar */}
           <SearchBar text={text} setText={setText} />
 
@@ -98,28 +99,20 @@ const Home = () => {
             <p>No episodes are available.</p>
           )}
           {episodes.length !== 0 && (
-            <select
-              className="appearance-none rounded-full bg-gray-400 px-3 text-center text-gray-600 outline-none"
-              onChange={(e) => handleSelectEpisode(e)}
-            >
-              <option>EP</option>
-              {episodes.map((episode, i) => (
-                <option key={i} value={i}>
-                  {episode.title.split(" ").at(-1)}
-                </option>
-              ))}
-            </select>
+            <EpisodeSelection
+              episodes={episodes}
+              handleSelectEpisode={handleSelectEpisode}
+            />
           )}
-
-          {/* handling error and loading */}
-          {(searchQuery.isLoading ||
-            serversQuery.isLoading ||
-            episodesQuery.isLoading) && <Spinner />}
-          {(serversQuery.isError ||
-            episodesQuery.isError ||
-            searchQuery.isError ||
-            queryError) && <Error />}
         </div>
+        {/* handling error and loading */}
+        {(searchQuery.isLoading ||
+          serversQuery.isLoading ||
+          episodesQuery.isLoading) && <Spinner />}
+        {(serversQuery.isError ||
+          episodesQuery.isError ||
+          searchQuery.isError ||
+          queryError) && <ErrorComp />}
 
         {/* video player */}
         {hasWindow && playerProp && <Player {...playerProp} />}
