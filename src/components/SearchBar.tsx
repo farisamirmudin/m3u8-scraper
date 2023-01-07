@@ -10,7 +10,7 @@ const SearchBar: FC<SearchBarProps> = ({ text, setText }) => {
     <input
       value={text}
       onChange={(e) => setText(e.target.value)}
-      className="flex-1 rounded-md px-3 py-1 outline-none"
+      className="min-w-[100px] flex-1 rounded-md px-3 py-1 outline-none"
       type="text"
       placeholder="Search"
     />
