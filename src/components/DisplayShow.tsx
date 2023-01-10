@@ -4,8 +4,8 @@ import Image from "next/image";
 import { FC } from "react";
 
 interface DisplayShowProps {
-  shows: Show[];
-  handleSelectShow: (show: Show) => Promise<void>;
+  shows: IShow[];
+  handleSelectShow: (show: IShow) => Promise<void>;
 }
 
 const DisplayShow: FC<DisplayShowProps> = ({ shows, handleSelectShow }) => {
