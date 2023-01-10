@@ -6,7 +6,7 @@ export const search = async (keyword: string) => {
   );
   const html = await res.text();
   const $ = load(html);
-  const video: Show[] = [];
+  const video: IShow[] = [];
   $("li.video-block").each((i, el) => {
     const title = $(el).find(".name").text().trim() ?? "";
     const img = $(el).find("img").attr("src") ?? "";

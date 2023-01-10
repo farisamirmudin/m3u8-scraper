@@ -12,9 +12,9 @@ import Hls from "hls.js";
 
 const Home = () => {
   const [text, setText] = useState("");
-  const [shows, setShows] = useState<Show[]>([]);
-  const [episodes, setEpisodes] = useState<Show[]>([]);
-  const [servers, setServers] = useState([] as string[]);
+  const [shows, setShows] = useState([] as IShow[]);
+  const [episodes, setEpisodes] = useState([] as IShow[]);
+  const [servers, setServers] = useState<IServerProp>();
   const [queryError, setQueryError] = useState(false);
 
   // trpc queries
@@ -50,9 +50,9 @@ const Home = () => {
   }, [debounceText]);
 
   useEffect(() => {
-    if (servers.length === 0) return;
+    if (!servers) return;
     const media = document.getElementById("video") as HTMLVideoElement;
-    const url = servers[0] || "";
+    const url = servers.urls[0] || "";
     if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(url);
@@ -67,13 +67,13 @@ const Home = () => {
       const servers = await serversQuery.mutateAsync({
         path: episode.path,
       });
-      setServers(servers.data || []);
+      setServers({ title: episode.title, urls: servers.data || [] });
     } catch {
       setQueryError(true);
     }
   };
 
-  const handleSelectShow = async (show: Show) => {
+  const handleSelectShow = async (show: IShow) => {
     try {
       const episodes = await episodesQuery.mutateAsync({
         path: show.path,
@@ -120,14 +120,18 @@ const Home = () => {
           queryError) && <ErrorComp />}
 
         {/* video player */}
-        {servers.length !== 0 && (
-          <video
-            id="video"
-            controls
-            playsInline
-            autoPlay
-            className="h-auto w-full rounded-md"
-          ></video>
+        {servers && (
+          <div>
+            <p className="text-lg">{servers.title}</p>
+            <video
+              id="video"
+              controls
+              playsInline
+              autoPlay
+              crossOrigin="anonymous"
+              className="h-auto w-full rounded-md"
+            ></video>
+          </div>
         )}
 
         {/* shows */}

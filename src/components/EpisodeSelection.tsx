@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 
 interface EpisodeSelectionProps {
-  episodes: Show[];
+  episodes: IShow[];
   handleSelectEpisode: (i: number) => Promise<void>;
 }
 
