@@ -13,7 +13,7 @@ const EpisodeSelection: FC<EpisodeSelectionProps> = ({
   const [selected, setSelected] = useState<string>();
   return (
     <div
-      className="relative cursor-pointer rounded-md bg-white px-3 py-1 text-center"
+      className="relative cursor-pointer rounded-md bg-gray-100 px-3 py-1 text-center"
       onClick={() => setShowSelection((prev) => !prev)}
     >
       <div className="flex items-center gap-2">
@@ -37,7 +37,7 @@ const EpisodeSelection: FC<EpisodeSelectionProps> = ({
       <div
         className={`${
           showSelection ? "absolute" : "hidden"
-        } top-10 right-0 z-10 max-h-80 w-20 overflow-auto rounded-md bg-white`}
+        } top-10 right-0 z-10 max-h-80 w-20 overflow-auto rounded-md bg-gray-100`}
       >
         {episodes.map((episode, i) => (
           <div

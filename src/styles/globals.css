@@ -7,8 +7,3 @@
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 1rem;
 }
-
-body {
-  background-color: #18181b;
-  color: #94a3b8;
-}

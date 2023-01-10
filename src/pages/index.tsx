@@ -4,18 +4,17 @@ import { useEffect, useState } from "react";
 import { trpc } from "../utils/trpc";
 import { useDebouncer } from "../utils/debouncerHook";
 import Spinner from "../components/Spinner";
-import Player from "../components/Player";
 import DisplayShow from "../components/DisplayShow";
 import SearchBar from "../components/SearchBar";
 import ErrorComp from "../components/ErrorComp";
 import EpisodeSelection from "../components/EpisodeSelection";
+import Hls from "hls.js";
 
 const Home = () => {
   const [text, setText] = useState("");
   const [shows, setShows] = useState<Show[]>([]);
   const [episodes, setEpisodes] = useState<Show[]>([]);
-  const [hasWindow, setHasWindow] = useState(false);
-  const [playerProp, setPlayerProp] = useState<PlayerProps>();
+  const [servers, setServers] = useState([] as string[]);
   const [queryError, setQueryError] = useState(false);
 
   // trpc queries
@@ -51,9 +50,15 @@ const Home = () => {
   }, [debounceText]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setHasWindow(true);
-  }, []);
+    if (servers.length === 0) return;
+    const media = document.getElementById("video") as HTMLVideoElement;
+    const url = servers[0] || "";
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(media);
+    }
+  }, [servers]);
 
   const handleSelectEpisode = async (i: number) => {
     const episode = episodes[i];
@@ -62,7 +67,7 @@ const Home = () => {
       const servers = await serversQuery.mutateAsync({
         path: episode.path,
       });
-      setPlayerProp({ title: episode.title, servers: servers.data! });
+      setServers(servers.data || []);
     } catch {
       setQueryError(true);
     }
@@ -81,12 +86,12 @@ const Home = () => {
   return (
     <>
       <Head>
-        <title>Alchemy</title>
+        <title>Alchemy Watch</title>
         <meta name="description" content="Watch Korean Drama" />
         <link rel="icon" href="/alogo.svg" />
       </Head>
       <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
-        <p className="text-4xl font-light">
+        <p className="text-4xl">
           <span className="text-indigo-500">Alchemy</span>Watch
         </p>
 
@@ -115,7 +120,15 @@ const Home = () => {
           queryError) && <ErrorComp />}
 
         {/* video player */}
-        {hasWindow && playerProp && <Player {...playerProp} />}
+        {servers.length !== 0 && (
+          <video
+            id="video"
+            controls
+            playsInline
+            autoPlay
+            className="h-auto w-full rounded-md"
+          ></video>
+        )}
 
         {/* shows */}
         {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}

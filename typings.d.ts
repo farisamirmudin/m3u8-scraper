@@ -4,11 +4,6 @@ interface Show {
   path: string;
 }
 
-interface PlayerProps {
-  title: string;
-  servers: string[];
-}
-
 interface Server {
   file: string;
   type: string;
