@@ -1,14 +1,14 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
 import { trpc } from "../utils/trpc";
 import { useDebouncer } from "../utils/debouncerHook";
-import Spinner from "../components/Spinner";
-import DisplayShow from "../components/DisplayShow";
+const Spinner = lazy(() => import("../components/Spinner"));
+const DisplayShow = lazy(() => import("../components/DisplayShow"));
+const ErrorComp = lazy(() => import("../components/ErrorComp"));
+const EpisodeSelection = lazy(() => import("../components/EpisodeSelection"));
 import SearchBar from "../components/SearchBar";
-import ErrorComp from "../components/ErrorComp";
-import EpisodeSelection from "../components/EpisodeSelection";
-import Hls from "hls.js";
+import ReactPlayer from "react-player/lazy";
 
 const Home = () => {
   const [text, setText] = useState("");
@@ -49,17 +49,6 @@ const Home = () => {
     fetchShows();
   }, [debounceText]);
 
-  useEffect(() => {
-    if (!servers) return;
-    const media = document.getElementById("video") as HTMLVideoElement;
-    const url = servers.urls[0] || "";
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(url);
-      hls.attachMedia(media);
-    }
-  }, [servers]);
-
   const handleSelectEpisode = async (i: number) => {
     const episode = episodes[i];
     if (!episode) return;
@@ -67,7 +56,7 @@ const Home = () => {
       const servers = await serversQuery.mutateAsync({
         path: episode.path,
       });
-      setServers({ title: episode.title, urls: servers.data || [] });
+      setServers({ title: episode.title, urls: servers.data! });
     } catch {
       setQueryError(true);
     }
@@ -83,6 +72,7 @@ const Home = () => {
       setQueryError(true);
     }
   };
+
   return (
     <>
       <Head>
@@ -90,56 +80,60 @@ const Home = () => {
         <meta name="description" content="Watch Korean Drama" />
         <link rel="icon" href="/alogo.svg" />
       </Head>
-      <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
-        <p className="text-4xl">
-          <span className="text-indigo-500">Alchemy</span>Watch
-        </p>
+      <Suspense>
+        <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
+          <p className="text-4xl">
+            <span className="text-indigo-500">Alchemy</span>Watch
+          </p>
 
-        <div className="flex items-center gap-4">
-          {/* searchbar */}
-          <SearchBar text={text} setText={setText} />
+          <div className="flex items-center gap-4">
+            {/* searchbar */}
+            <SearchBar text={text} setText={setText} />
 
-          {/* episodes */}
-          {episodesQuery.isSuccess && episodes.length === 0 && (
-            <p>No episodes are available.</p>
-          )}
-          {episodes.length !== 0 && (
-            <EpisodeSelection
-              episodes={episodes}
-              handleSelectEpisode={handleSelectEpisode}
-            />
-          )}
-        </div>
-        {/* handling error and loading */}
-        {(searchQuery.isLoading ||
-          serversQuery.isLoading ||
-          episodesQuery.isLoading) && <Spinner />}
-        {(serversQuery.isError ||
-          episodesQuery.isError ||
-          searchQuery.isError ||
-          queryError) && <ErrorComp />}
-
-        {/* video player */}
-        {servers && (
-          <div>
-            <p className="text-lg">{servers.title}</p>
-            <video
-              id="video"
-              controls
-              playsInline
-              autoPlay
-              crossOrigin="anonymous"
-              className="h-auto w-full rounded-md"
-            ></video>
+            {/* episodes */}
+            {episodesQuery.isSuccess && episodes.length === 0 && (
+              <p>No episodes are available.</p>
+            )}
+            {episodes.length !== 0 && (
+              <EpisodeSelection
+                episodes={episodes}
+                handleSelectEpisode={handleSelectEpisode}
+              />
+            )}
           </div>
-        )}
+          {/* handling error and loading */}
+          {(searchQuery.isLoading ||
+            serversQuery.isLoading ||
+            episodesQuery.isLoading) && <Spinner />}
+          {(serversQuery.isError ||
+            episodesQuery.isError ||
+            searchQuery.isError ||
+            queryError) && <ErrorComp />}
 
-        {/* shows */}
-        {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
-        {shows.length !== 0 && (
-          <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
-        )}
-      </main>
+          {/* video player */}
+          {servers && (
+            <div>
+              <p className="text-lg">{servers.title}</p>
+              <ReactPlayer
+                url={servers.urls[0]}
+                controls
+                playing
+                playsinline
+                width="100%"
+                height="auto"
+              />
+            </div>
+          )}
+
+          {/* shows */}
+          {searchQuery.isSuccess && shows.length === 0 && (
+            <p>No shows found.</p>
+          )}
+          {shows.length !== 0 && (
+            <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
+          )}
+        </main>
+      </Suspense>
     </>
   );
 };
