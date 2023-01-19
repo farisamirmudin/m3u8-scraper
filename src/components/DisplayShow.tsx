@@ -1,14 +1,14 @@
-import React, { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
-import { Show } from "../../typings";
 
-const DisplayShow = ({
-  shows,
-  handleSelectShow,
-}: {
-  shows: Show[];
-  handleSelectShow: (show: Show) => Promise<void>;
-}) => {
+import { FC } from "react";
+import { video } from "../utils/fetcher";
+
+interface DisplayShowProps {
+  shows: video[];
+  handleSelectShow: (show: video) => Promise<void>;
+}
+
+const DisplayShow: FC<DisplayShowProps> = ({ shows, handleSelectShow }) => {
   return (
     <section className="video-grid">
       {shows.map((show, i) => (
@@ -25,7 +25,7 @@ const DisplayShow = ({
             alt="banner"
           />
 
-          <p className={`text-center text-xs`}>{show.name}</p>
+          <p className={`text-center text-xs`}>{show.title}</p>
         </div>
       ))}
     </section>

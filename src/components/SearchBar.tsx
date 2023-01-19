@@ -1,19 +1,18 @@
-import React, { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
+import { FC } from "react";
 
-const SearchBar = ({
-  text,
-  setText,
-}: {
+interface SearchBarProps {
   text: string;
   setText: Dispatch<SetStateAction<string>>;
-}) => {
+}
+const SearchBar: FC<SearchBarProps> = ({ text, setText }) => {
   return (
     <input
       value={text}
       onChange={(e) => setText(e.target.value)}
-      className="w-full border-b-2 border-indigo-600 bg-transparent py-1 placeholder-slate-400 outline-none"
+      className="min-w-[100px] flex-1 rounded-md bg-gray-100 px-3 py-1 placeholder-zinc-600 outline-none"
       type="text"
-      placeholder="Search Drama..."
+      placeholder="Search"
     />
   );
 };

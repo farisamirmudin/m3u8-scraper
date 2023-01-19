@@ -1,36 +1,33 @@
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
 import { trpc } from "../utils/trpc";
-import { toast, Toaster } from "react-hot-toast";
 import { useDebouncer } from "../utils/debouncerHook";
-import { Show } from "../../typings";
-import Spinner from "../components/Spinner";
-import EpisodesGrid from "../components/EpisodesGrid";
-import Player from "../components/Player";
-import DisplayShow from "../components/DisplayShow";
+const Spinner = lazy(() => import("../components/Spinner"));
+const DisplayShow = lazy(() => import("../components/DisplayShow"));
+const ErrorComp = lazy(() => import("../components/ErrorComp"));
+const EpisodeSelection = lazy(() => import("../components/EpisodeSelection"));
 import SearchBar from "../components/SearchBar";
+import ReactPlayer from "react-player/lazy";
+import { z } from "zod";
+import { video } from "../utils/fetcher";
+
+const serverScheme = z.object({
+  title: z.string(),
+  urls: z.array(z.string()),
+});
 
 const Home = () => {
   const [text, setText] = useState("");
-  const [isDrama, setIsDrama] = useState(true);
-  const [shows, setShows] = useState<Show[]>([]);
-  const [episodes, setEpisodes] = useState<Show[]>([]);
-  const [hasWindow, setHasWindow] = useState(false);
-  const [selectedPagination, setSelectedPagination] = useState(1);
-  const [columns, setColumns] = useState(0);
-  const selectedShow = useRef("");
-  const selectedEpisode = useRef("");
-  const title = useRef("");
-  const selectedServerRef = useRef(0);
-  const serversRef = useRef<string[]>([]);
-  const [selectedServer, setSelectedServer] = useState<string>();
-  const [corsError, setCorsError] = useState(false);
+  const [shows, setShows] = useState([] as video[]);
+  const [episodes, setEpisodes] = useState([] as video[]);
+  const [servers, setServers] = useState<z.infer<typeof serverScheme>>();
+  const [queryError, setQueryError] = useState(false);
 
   // trpc queries
-  const searchQuery = trpc.fetcher.search.useMutation({ retry: 3 });
-  const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 3 });
-  const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 3 });
+  const searchQuery = trpc.fetcher.search.useMutation({ retry: 5 });
+  const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 5 });
+  const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 5 });
 
   const debounceText = useDebouncer(text);
 
@@ -38,12 +35,9 @@ const Home = () => {
     searchQuery.reset();
     episodesQuery.reset();
     serversQuery.reset();
-    selectedShow.current = "";
-    selectedEpisode.current = "";
-    setColumns(0);
-    setSelectedPagination(1);
     setEpisodes([]);
     setShows([]);
+    setQueryError(false);
   };
 
   useEffect(() => {
@@ -53,121 +47,100 @@ const Home = () => {
       try {
         const shows = await searchQuery.mutateAsync({
           text: debounceText,
-          drama: isDrama,
         });
         setShows(shows.data);
       } catch {
-        toast.error("Error");
+        setQueryError(true);
       }
     };
     fetchShows();
   }, [debounceText]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setHasWindow(true);
-  }, []);
-
-  const handleSelectEpisode = async (episode: Show) => {
+  const handleSelectEpisode = async (i: number) => {
+    const episode = episodes[i];
+    if (!episode) return;
     try {
       const servers = await serversQuery.mutateAsync({
         path: episode.path,
-        drama: isDrama,
       });
-      title.current = episode.name;
-      selectedEpisode.current = episode.path;
-      selectedServerRef.current = 0;
-      serversRef.current = servers.data;
-      setSelectedServer(serversRef.current[selectedServerRef.current]);
-      setCorsError(false);
+      setServers({ title: episode.title, urls: servers.data! });
     } catch {
-      toast.error("Error");
+      setQueryError(true);
     }
   };
 
-  const handleSelectShow = async (show: Show) => {
+  const handleSelectShow = async (show: video) => {
     try {
       const episodes = await episodesQuery.mutateAsync({
         path: show.path,
-        drama: isDrama,
       });
-      selectedShow.current = show.path;
-      setSelectedPagination(1);
-      setColumns(0);
       setEpisodes(episodes.data);
     } catch {
-      toast.error("Error");
+      setQueryError(true);
     }
-  };
-
-  const episodesGridProps = {
-    episodes,
-    handleSelectEpisode,
-    selectedEpisode,
-    selectedPagination,
-    setSelectedPagination,
-    columns,
-    setColumns,
-  };
-
-  const playerError = (error: any) => {
-    if (error !== "hlsError") return;
-    if (selectedServerRef.current === serversRef.current.length - 1) {
-      setCorsError(true);
-      return;
-    }
-    selectedServerRef.current += 1;
-    setSelectedServer(serversRef.current[selectedServerRef.current]);
-  };
-
-  const playerProps = {
-    title,
-    selectedServer,
-    playerError,
   };
 
   return (
     <>
-      <Toaster position="bottom-center" />
       <Head>
-        <title>Alchemy</title>
+        <title>Alchemy Watch</title>
         <meta name="description" content="Watch Korean Drama" />
         <link rel="icon" href="/alogo.svg" />
       </Head>
-      <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
-        <p className="text-5xl font-bold">
-          <span className="text-indigo-600">Al</span>chemy
-        </p>
+      <Suspense>
+        <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
+          <p className="text-4xl">
+            <span className="text-indigo-500">Alchemy</span>Watch
+          </p>
 
-        {/* searchbar */}
-        <SearchBar text={text} setText={setText} />
+          <div className="flex items-center gap-4">
+            {/* searchbar */}
+            <SearchBar text={text} setText={setText} />
 
-        {/* options */}
-        {/* <SelectOption isDrama={isDrama} setIsDrama={setIsDrama} /> */}
+            {/* episodes */}
+            {episodesQuery.isSuccess && episodes.length === 0 && (
+              <p>No episodes are available.</p>
+            )}
+            {episodes.length !== 0 && (
+              <EpisodeSelection
+                episodes={episodes}
+                handleSelectEpisode={handleSelectEpisode}
+              />
+            )}
+          </div>
+          {/* handling error and loading */}
+          {(searchQuery.isLoading ||
+            serversQuery.isLoading ||
+            episodesQuery.isLoading) && <Spinner />}
+          {(serversQuery.isError ||
+            episodesQuery.isError ||
+            searchQuery.isError ||
+            queryError) && <ErrorComp />}
 
-        {/* video player */}
-        {serversQuery.isLoading && <Spinner />}
-        {serversQuery.isError && <p>Error</p>}
-        {hasWindow && !corsError && serversRef.current && (
-          <Player {...playerProps} />
-        )}
+          {/* video player */}
+          {servers && (
+            <div>
+              <p className="text-lg">{servers.title}</p>
+              <ReactPlayer
+                url={servers.urls[0]}
+                controls
+                playing
+                playsinline
+                width="100%"
+                height="auto"
+              />
+            </div>
+          )}
 
-        {/* episodes */}
-        {episodesQuery.isLoading && <Spinner />}
-        {episodesQuery.isError && <p>Error</p>}
-        {episodesQuery.isSuccess && episodes.length === 0 && (
-          <p>No episodes are out yet.</p>
-        )}
-        {episodes.length !== 0 && <EpisodesGrid {...episodesGridProps} />}
-
-        {/* shows */}
-        {searchQuery.isLoading && <Spinner />}
-        {searchQuery.isError && <p>Error</p>}
-        {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
-        {shows.length !== 0 && (
-          <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
-        )}
-      </main>
+          {/* shows */}
+          {searchQuery.isSuccess && shows.length === 0 && (
+            <p>No shows found.</p>
+          )}
+          {shows.length !== 0 && (
+            <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
+          )}
+        </main>
+      </Suspense>
     </>
   );
 };
