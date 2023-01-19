@@ -1,7 +1,8 @@
 import { FC, useState } from "react";
+import { video } from "../utils/fetcher";
 
 interface EpisodeSelectionProps {
-  episodes: IShow[];
+  episodes: video[];
   handleSelectEpisode: (i: number) => Promise<void>;
 }
 

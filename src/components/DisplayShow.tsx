@@ -1,11 +1,11 @@
-import React from "react";
 import Image from "next/image";
 
 import { FC } from "react";
+import { video } from "../utils/fetcher";
 
 interface DisplayShowProps {
-  shows: IShow[];
-  handleSelectShow: (show: IShow) => Promise<void>;
+  shows: video[];
+  handleSelectShow: (show: video) => Promise<void>;
 }
 
 const DisplayShow: FC<DisplayShowProps> = ({ shows, handleSelectShow }) => {
