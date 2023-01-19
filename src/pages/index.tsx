@@ -9,12 +9,19 @@ const ErrorComp = lazy(() => import("../components/ErrorComp"));
 const EpisodeSelection = lazy(() => import("../components/EpisodeSelection"));
 import SearchBar from "../components/SearchBar";
 import ReactPlayer from "react-player/lazy";
+import { z } from "zod";
+import { video } from "../utils/fetcher";
+
+const serverScheme = z.object({
+  title: z.string(),
+  urls: z.array(z.string()),
+});
 
 const Home = () => {
   const [text, setText] = useState("");
-  const [shows, setShows] = useState([] as IShow[]);
-  const [episodes, setEpisodes] = useState([] as IShow[]);
-  const [servers, setServers] = useState<IServerProp>();
+  const [shows, setShows] = useState([] as video[]);
+  const [episodes, setEpisodes] = useState([] as video[]);
+  const [servers, setServers] = useState<z.infer<typeof serverScheme>>();
   const [queryError, setQueryError] = useState(false);
 
   // trpc queries
@@ -62,7 +69,7 @@ const Home = () => {
     }
   };
 
-  const handleSelectShow = async (show: IShow) => {
+  const handleSelectShow = async (show: video) => {
     try {
       const episodes = await episodesQuery.mutateAsync({
         path: show.path,

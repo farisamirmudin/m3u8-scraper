@@ -1,7 +1,5 @@
 import { z } from "zod";
-import { getServers } from "../../../utils/fetcher/getServers";
-import { getEpisodes } from "../../../utils/fetcher/getEpisodes";
-import { search } from "../../../utils/fetcher/search";
+import { getServers, getEpisodes, search } from "../../../utils/fetcher";
 
 import { router, publicProcedure } from "../trpc";
 
