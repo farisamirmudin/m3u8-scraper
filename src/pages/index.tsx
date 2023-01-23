@@ -1,12 +1,12 @@
 import Head from "next/head";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 
 import { trpc } from "../utils/trpc";
 import { useDebouncer } from "../utils/debouncerHook";
-const Spinner = lazy(() => import("../components/Spinner"));
-const DisplayShow = lazy(() => import("../components/DisplayShow"));
-const ErrorComp = lazy(() => import("../components/ErrorComp"));
-const EpisodeSelection = lazy(() => import("../components/EpisodeSelection"));
+import Spinner from "../components/Spinner";
+import DisplayShow from "../components/DisplayShow";
+import ErrorComp from "../components/ErrorComp";
+import EpisodeSelection from "../components/EpisodeSelection";
 import SearchBar from "../components/SearchBar";
 import ReactPlayer from "react-player/lazy";
 import { z } from "zod";
@@ -87,60 +87,56 @@ const Home = () => {
         <meta name="description" content="Watch Korean Drama" />
         <link rel="icon" href="/alogo.svg" />
       </Head>
-      <Suspense>
-        <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
-          <p className="text-4xl">
-            <span className="text-indigo-500">Alchemy</span>Watch
-          </p>
+      <main className="mx-auto min-h-screen max-w-sm space-y-4 px-6 py-12 md:max-w-2xl lg:max-w-4xl">
+        <p className="text-4xl">
+          <span className="text-indigo-500">Alchemy</span>Watch
+        </p>
 
-          <div className="flex items-center gap-4">
-            {/* searchbar */}
-            <SearchBar text={text} setText={setText} />
+        <div className="flex items-center gap-4">
+          {/* searchbar */}
+          <SearchBar text={text} setText={setText} />
 
-            {/* episodes */}
-            {episodesQuery.isSuccess && episodes.length === 0 && (
-              <p>No episodes are available.</p>
-            )}
-            {episodes.length !== 0 && (
-              <EpisodeSelection
-                episodes={episodes}
-                handleSelectEpisode={handleSelectEpisode}
-              />
-            )}
+          {/* episodes */}
+          {episodesQuery.isSuccess && episodes.length === 0 && (
+            <p>No episodes are available.</p>
+          )}
+          {episodes.length !== 0 && (
+            <EpisodeSelection
+              episodes={episodes}
+              handleSelectEpisode={handleSelectEpisode}
+            />
+          )}
+        </div>
+        {/* handling error and loading */}
+        {(searchQuery.isLoading ||
+          serversQuery.isLoading ||
+          episodesQuery.isLoading) && <Spinner />}
+        {(serversQuery.isError ||
+          episodesQuery.isError ||
+          searchQuery.isError ||
+          queryError) && <ErrorComp />}
+
+        {/* video player */}
+        {servers && (
+          <div>
+            <p className="text-lg">{servers.title}</p>
+            <ReactPlayer
+              url={servers.urls[0]}
+              controls
+              playing
+              playsinline
+              width="100%"
+              height="auto"
+            />
           </div>
-          {/* handling error and loading */}
-          {(searchQuery.isLoading ||
-            serversQuery.isLoading ||
-            episodesQuery.isLoading) && <Spinner />}
-          {(serversQuery.isError ||
-            episodesQuery.isError ||
-            searchQuery.isError ||
-            queryError) && <ErrorComp />}
+        )}
 
-          {/* video player */}
-          {servers && (
-            <div>
-              <p className="text-lg">{servers.title}</p>
-              <ReactPlayer
-                url={servers.urls[0]}
-                controls
-                playing
-                playsinline
-                width="100%"
-                height="auto"
-              />
-            </div>
-          )}
-
-          {/* shows */}
-          {searchQuery.isSuccess && shows.length === 0 && (
-            <p>No shows found.</p>
-          )}
-          {shows.length !== 0 && (
-            <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
-          )}
-        </main>
-      </Suspense>
+        {/* shows */}
+        {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
+        {shows.length !== 0 && (
+          <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
+        )}
+      </main>
     </>
   );
 };
