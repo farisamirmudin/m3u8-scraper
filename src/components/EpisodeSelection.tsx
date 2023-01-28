@@ -6,13 +6,13 @@ import Spinner from "./Spinner";
 const EpisodeSelection = () => {
   const store = useStore();
   const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 5 });
-  const [showSelection, setShowSelection] = useState(false);
+  const [toggle, setToggle] = useState(false);
   const [selected, setSelected] = useState<string>();
   return (
     <>
       <div
         className="relative cursor-pointer rounded-md bg-gray-100 px-3 py-1 text-center"
-        onClick={() => setShowSelection((prev) => !prev)}
+        onClick={() => setToggle((prev) => !prev)}
       >
         <div className="flex items-center gap-2">
           <p>Episode {selected} </p>
@@ -34,7 +34,7 @@ const EpisodeSelection = () => {
 
         <div
           className={`${
-            showSelection ? "absolute" : "hidden"
+            toggle ? "absolute" : "hidden"
           } top-10 right-0 z-10 max-h-80 w-20 overflow-auto rounded-md bg-gray-100`}
         >
           {store.episodes.map((episode, i) => (
@@ -54,7 +54,6 @@ const EpisodeSelection = () => {
           ))}
         </div>
       </div>
-      {serversQuery.isLoading && <Spinner />}
     </>
   );
 };

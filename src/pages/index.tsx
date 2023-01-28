@@ -41,7 +41,6 @@ const Home = () => {
 
         <div className="flex items-center gap-4">
           <SearchBar />
-          {searchQuery.isLoading && <Spinner />}
           {store.episodes.length !== 0 && <EpisodeSelection />}
         </div>
 

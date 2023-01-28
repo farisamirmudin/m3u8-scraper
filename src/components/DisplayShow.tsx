@@ -8,10 +8,6 @@ const DisplayShow = () => {
   const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 5 });
   return (
     <>
-      {episodesQuery.isLoading && <Spinner />}
-      {episodesQuery.isSuccess && store.shows.length === 0 && (
-        <p>Not air yet.</p>
-      )}
       <div className="video-grid">
         {store.shows.map((show, i) => (
           <div
