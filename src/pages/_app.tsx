@@ -4,8 +4,8 @@ import { trpc } from "../utils/trpc";
 
 import "../styles/globals.css";
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const App: AppType = ({ Component, pageProps }) => {
   return <Component {...pageProps} />;
 };
 
-export default trpc.withTRPC(MyApp);
+export default trpc.withTRPC(App);

@@ -1,6 +1,5 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
-
+import { useEffect } from "react";
 import { trpc } from "../utils/trpc";
 import { useDebouncer } from "../utils/debouncerHook";
 import Spinner from "../components/Spinner";
@@ -9,76 +8,24 @@ import ErrorComp from "../components/ErrorComp";
 import EpisodeSelection from "../components/EpisodeSelection";
 import SearchBar from "../components/SearchBar";
 import ReactPlayer from "react-player/lazy";
-import { z } from "zod";
-import { video } from "../utils/fetcher";
-
-const serverScheme = z.object({
-  title: z.string(),
-  urls: z.array(z.string()),
-});
+import { useStore } from "../utils/store";
 
 const Home = () => {
-  const [text, setText] = useState("");
-  const [shows, setShows] = useState([] as video[]);
-  const [episodes, setEpisodes] = useState([] as video[]);
-  const [servers, setServers] = useState<z.infer<typeof serverScheme>>();
-  const [queryError, setQueryError] = useState(false);
-
-  // trpc queries
+  const store = useStore();
   const searchQuery = trpc.fetcher.search.useMutation({ retry: 5 });
-  const episodesQuery = trpc.fetcher.getEpisodes.useMutation({ retry: 5 });
-  const serversQuery = trpc.fetcher.getServers.useMutation({ retry: 5 });
-
-  const debounceText = useDebouncer(text);
-
-  const reset = () => {
-    searchQuery.reset();
-    episodesQuery.reset();
-    serversQuery.reset();
-    setEpisodes([]);
-    setShows([]);
-    setQueryError(false);
-  };
+  const debounceText = useDebouncer(store.text);
 
   useEffect(() => {
     if (debounceText === "") return;
-    reset();
+    store.reset();
     const fetchShows = async () => {
-      try {
-        const shows = await searchQuery.mutateAsync({
-          text: debounceText,
-        });
-        setShows(shows.data);
-      } catch {
-        setQueryError(true);
-      }
+      const shows = await searchQuery.mutateAsync({
+        text: debounceText,
+      });
+      store.setShows(shows.data);
     };
     fetchShows();
   }, [debounceText]);
-
-  const handleSelectEpisode = async (i: number) => {
-    const episode = episodes[i];
-    if (!episode) return;
-    try {
-      const servers = await serversQuery.mutateAsync({
-        path: episode.path,
-      });
-      setServers({ title: episode.title, urls: servers.data! });
-    } catch {
-      setQueryError(true);
-    }
-  };
-
-  const handleSelectShow = async (show: video) => {
-    try {
-      const episodes = await episodesQuery.mutateAsync({
-        path: show.path,
-      });
-      setEpisodes(episodes.data);
-    } catch {
-      setQueryError(true);
-    }
-  };
 
   return (
     <>
@@ -93,35 +40,16 @@ const Home = () => {
         </p>
 
         <div className="flex items-center gap-4">
-          {/* searchbar */}
-          <SearchBar text={text} setText={setText} />
-
-          {/* episodes */}
-          {episodesQuery.isSuccess && episodes.length === 0 && (
-            <p>No episodes are available.</p>
-          )}
-          {episodes.length !== 0 && (
-            <EpisodeSelection
-              episodes={episodes}
-              handleSelectEpisode={handleSelectEpisode}
-            />
-          )}
+          <SearchBar />
+          {searchQuery.isLoading && <Spinner />}
+          {store.episodes.length !== 0 && <EpisodeSelection />}
         </div>
-        {/* handling error and loading */}
-        {(searchQuery.isLoading ||
-          serversQuery.isLoading ||
-          episodesQuery.isLoading) && <Spinner />}
-        {(serversQuery.isError ||
-          episodesQuery.isError ||
-          searchQuery.isError ||
-          queryError) && <ErrorComp />}
 
-        {/* video player */}
-        {servers && (
+        {store.servers && (
           <div>
-            <p className="text-lg">{servers.title}</p>
+            <p className="text-lg">{store.servers.title}</p>
             <ReactPlayer
-              url={servers.urls[0]}
+              url={store.servers.urls[0]}
               controls
               playing
               playsinline
@@ -132,10 +60,10 @@ const Home = () => {
         )}
 
         {/* shows */}
-        {searchQuery.isSuccess && shows.length === 0 && <p>No shows found.</p>}
-        {shows.length !== 0 && (
-          <DisplayShow shows={shows} handleSelectShow={handleSelectShow} />
+        {searchQuery.isSuccess && store.shows.length === 0 && (
+          <p>No shows found.</p>
         )}
+        {store.shows.length !== 0 && <DisplayShow />}
       </main>
     </>
   );
