@@ -1,19 +1,13 @@
 import { load } from "cheerio";
 import { decrypt, encrypt } from "./cipher";
 import { z } from "zod";
-
-const videoScheme = z.object({
-  title: z.string(),
-  img: z.string(),
-  path: z.string(),
-});
-export type video = z.infer<typeof videoScheme>;
+import { videoScheme } from "./store";
 
 export const getEpisodes = async (path: string) => {
   const res = await fetch(`http://asianplay.net${path}`);
   const html = await res.text();
   const $ = load(html);
-  const episodes = [] as video[];
+  const episodes = [] as z.infer<typeof videoScheme>[];
   $("ul.listing.items.lists li").each((_, el) => {
     const path = $(el).find("a").attr("href")?.trim() ?? "";
     const img = $(el).find(".picture img").attr("src")?.trim() ?? "";
@@ -51,7 +45,7 @@ export const search = async (keyword: string) => {
   );
   const html = await res.text();
   const $ = load(html);
-  const videos = [] as video[];
+  const videos = [] as z.infer<typeof videoScheme>[];
   $("li.video-block").each((_, el) => {
     const title = $(el).find(".name").text().trim() || "";
     const img = $(el).find("img").attr("src") || "";
