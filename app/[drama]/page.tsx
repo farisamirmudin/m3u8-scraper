@@ -7,7 +7,7 @@ type Params = {
   };
 };
 export default async function Page({ params: { drama } }: Params) {
-  const urlToFetch = new URL("http://localhost:3333/api/dramas/episodes");
+  const urlToFetch = new URL("http://localhost:3000/api/dramas/episodes");
   urlToFetch.searchParams.set("drama", `${drama}-episode-1`);
   const res = await fetch(urlToFetch);
   const episodes = (await res.json()) as Video[];
