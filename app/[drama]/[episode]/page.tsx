@@ -8,7 +8,7 @@ type Params = {
     episode: string;
   };
 };
-const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3000";
+
 export default async function Page({ params: { drama, episode } }: Params) {
   // const urlToFetch = new URL(`${HOST}/api/dramas/episodes/servers`);
   // urlToFetch.searchParams.set("selection", `${drama}-episode-${episode}`);
