@@ -18,6 +18,7 @@ export default function Home() {
       .then(setDramaList);
   return (
     <main className="flex flex-col gap-4">
+      <p className="text-2xl">Search drama</p>
       <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2">
         <input
           {...register("dramaName")}
