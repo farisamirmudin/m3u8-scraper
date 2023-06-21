@@ -7,13 +7,12 @@ type Params = {
     episode: string;
   };
 };
+const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3333";
 export default async function Page({ params: { drama, episode } }: Params) {
   const dramaToFetch = `${drama}-episode-${episode}`;
-  const serversToFetch = new URL(
-    "http://localhost:3333/api/dramas/episodes/servers"
-  );
+  const serversToFetch = new URL(`${HOST}/api/dramas/episodes/servers`);
   serversToFetch.searchParams.set("selection", dramaToFetch);
-  const episodesToFetch = new URL("http://localhost:3333/api/dramas/episodes");
+  const episodesToFetch = new URL(`${HOST}/api/dramas/episodes`);
   episodesToFetch.searchParams.set("drama", dramaToFetch);
   const [links, episodes] = await Promise.all([
     fetch(serversToFetch)

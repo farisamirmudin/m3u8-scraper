@@ -7,19 +7,17 @@ type DramaType = {
   drama: string;
   episode: string;
 };
-
+const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3333";
 export default function Drama({ drama, episode }: DramaType) {
   const dramaToFetch = `${drama}-episode-${episode}`;
-  const linksToFetch = new URL(
-    "http://localhost:3333/api/dramas/episodes/servers"
-  );
+  const linksToFetch = new URL(`${HOST}/api/dramas/episodes/servers`);
   linksToFetch.searchParams.set("selection", dramaToFetch);
   const { data: links } = useQuery(["drama", drama, episode], () =>
     fetch(linksToFetch)
       .then((res) => res.json())
       .then((data) => data as string[])
   );
-  const episodesToFetch = new URL("http://localhost:3333/api/dramas/episodes");
+  const episodesToFetch = new URL(`${HOST}/api/dramas/episodes`);
   episodesToFetch.searchParams.set("drama", dramaToFetch);
   const { data: episodes } = useQuery(["episode", drama, episode], () =>
     fetch(episodesToFetch)
