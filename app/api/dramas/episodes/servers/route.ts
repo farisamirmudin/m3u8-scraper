@@ -1,4 +1,3 @@
-import { Video } from "@/typings/video";
 import { decrypt, encrypt } from "@/utils/cipher";
 import { load } from "cheerio";
 import { NextRequest, NextResponse } from "next/server";
