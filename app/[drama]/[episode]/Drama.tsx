@@ -1,37 +1,40 @@
+"use client";
 import { Video } from "@/typings/video";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
-type Params = {
-  params: {
-    drama: string;
-    episode: string;
-  };
+type DramaType = {
+  drama: string;
+  episode: string;
 };
-export default async function Page({ params: { drama, episode } }: Params) {
+
+export default function Drama({ drama, episode }: DramaType) {
   const dramaToFetch = `${drama}-episode-${episode}`;
-  const serversToFetch = new URL(
+  const linksToFetch = new URL(
     "http://localhost:3333/api/dramas/episodes/servers"
   );
-  serversToFetch.searchParams.set("selection", dramaToFetch);
+  linksToFetch.searchParams.set("selection", dramaToFetch);
+  const { data: links } = useQuery(["drama", drama, episode], () =>
+    fetch(linksToFetch)
+      .then((res) => res.json())
+      .then((data) => data as string[])
+  );
   const episodesToFetch = new URL("http://localhost:3333/api/dramas/episodes");
   episodesToFetch.searchParams.set("drama", dramaToFetch);
-  const [links, episodes] = await Promise.all([
-    fetch(serversToFetch)
-      .then((res) => res.json())
-      .then((data) => data as string[]),
+  const { data: episodes } = useQuery(["episode", drama, episode], () =>
     fetch(episodesToFetch)
       .then((res) => res.json())
-      .then((data) => data as Video[]),
-  ]);
+      .then((data) => data as Video[])
+  );
   return (
     <div className="">
       <div className="flex flex-col gap-2">
-        {(links ?? []).map((link) => (
-          <p>{link}</p>
+        {links?.map((link, i) => (
+          <p key={i}>{link}</p>
         ))}
       </div>
       <div className="flex gap-2 flex-wrap">
-        {(episodes ?? []).reverse().map((ep) => {
+        {episodes?.map((ep, i) => {
           const regex = /videos\/(.*)-episode-\d+/;
           const dramaName = (regex.exec(ep.path) ?? [])[1];
           const selectedEpisode = ep.title.split(" ").at(-1) ?? "1";
@@ -42,7 +45,11 @@ export default async function Page({ params: { drama, episode } }: Params) {
                 "bg-white rounded-full text-black"
               }`}
             >
-              <Link href={`/${dramaName}/${selectedEpisode}`}>
+              <Link
+                key={i}
+                prefetch={false}
+                href={`/${dramaName}/${selectedEpisode}`}
+              >
                 {selectedEpisode}
               </Link>
             </div>
