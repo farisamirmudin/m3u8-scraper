@@ -1,27 +1,41 @@
 import { Video } from "@/typings/video";
 import Link from "next/link";
 
-type Params = {
+type PageType = {
   params: {
     drama: string;
   };
+  searchParams: {
+    episode: string;
+  };
 };
-export default async function Page({ params: { drama } }: Params) {
+export default async function Page({
+  params: { drama },
+  searchParams: { episode },
+}: PageType) {
   const urlToFetch = new URL("http://localhost:3000/api/dramas/episodes");
-  urlToFetch.searchParams.set("drama", `${drama}-episode-1`);
-  const res = await fetch(urlToFetch);
-  const episodes = (await res.json()) as Video[];
+  urlToFetch.searchParams.set("drama", `${drama}-episode-${episode}`);
+  const episodes = await fetch(urlToFetch)
+    .then((res) => res.json())
+    .then((data) => data as Video[]);
   return (
     <div className="">
-      <div className="flex flex-col gap-2">
-        {episodes.map((episode) => (
-          <div className="">
-            <Link href={`${drama}/${episode.path.split("-").at(-1) ?? 1}`}>
-              {episode.title}
+      <p className="text-lg mb-8">Episodes</p>
+
+      <div className="episode-grid">
+        {(episodes ?? []).map((ep) => {
+          const regex = /videos\/(.*)-episode-\d+/;
+          const dramaName = (regex.exec(ep.path) ?? [])[1];
+          const selectedEpisode = ep.title.split(" ").at(-1) ?? "1";
+          return (
+            <Link
+              href={`/${dramaName}/${selectedEpisode}`}
+              className="text-center hover:bg-violet-600"
+            >
+              {selectedEpisode}
             </Link>
-            <p>{episode.path}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
