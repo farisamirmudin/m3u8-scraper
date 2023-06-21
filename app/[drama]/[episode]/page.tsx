@@ -29,15 +29,15 @@ export default async function Page({ params: { drama, episode } }: Params) {
           <p className="hover:bg-violet-600">{link}</p>
         ))}
       </div>
-      <div className="flex gap-2 flex-wrap">
-        {(episodes ?? []).reverse().map((ep) => {
+      <div className="episode-grid">
+        {(episodes ?? []).map((ep) => {
           const regex = /videos\/(.*)-episode-\d+/;
           const dramaName = (regex.exec(ep.path) ?? [])[1];
           const selectedEpisode = ep.title.split(" ").at(-1) ?? "1";
           return (
             <Link
               href={`/${dramaName}/${selectedEpisode}`}
-              className={`px-2 hover:bg-violet-600 ${
+              className={`text-center hover:bg-violet-600 ${
                 selectedEpisode === episode && "bg-violet-500"
               }`}
             >
