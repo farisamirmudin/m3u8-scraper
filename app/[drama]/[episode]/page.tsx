@@ -7,7 +7,7 @@ type Params = {
     episode: string;
   };
 };
-const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3333";
+const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3000";
 export default async function Page({ params: { drama, episode } }: Params) {
   const dramaToFetch = `${drama}-episode-${episode}`;
   const serversToFetch = new URL(`${HOST}/api/dramas/episodes/servers`);
@@ -23,10 +23,10 @@ export default async function Page({ params: { drama, episode } }: Params) {
       .then((data) => data as Video[]),
   ]);
   return (
-    <div className="">
-      <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2 break-all">
         {(links ?? []).map((link) => (
-          <p>{link}</p>
+          <p className="hover:bg-violet-600">{link}</p>
         ))}
       </div>
       <div className="flex gap-2 flex-wrap">
@@ -35,16 +35,14 @@ export default async function Page({ params: { drama, episode } }: Params) {
           const dramaName = (regex.exec(ep.path) ?? [])[1];
           const selectedEpisode = ep.title.split(" ").at(-1) ?? "1";
           return (
-            <div
-              className={`px-1 ${
-                selectedEpisode === episode &&
-                "bg-white rounded-full text-black"
+            <Link
+              href={`/${dramaName}/${selectedEpisode}`}
+              className={`px-2 hover:bg-violet-600 ${
+                selectedEpisode === episode && "bg-violet-500"
               }`}
             >
-              <Link href={`/${dramaName}/${selectedEpisode}`}>
-                {selectedEpisode}
-              </Link>
-            </div>
+              {selectedEpisode}
+            </Link>
           );
         })}
       </div>
