@@ -37,10 +37,13 @@ export default async function Page({ params: { drama, episode } }: Params) {
   const links = (source.match(/(https.+?m3u8)/g) ?? []) as string[];
   return (
     <div className="">
-      <p className="text-lg mb-8">Links</p>
-      <div className="flex flex-col gap-2 break-all">
-        {links.map((link) => (
-          <DisplayLink link={link} />
+      <p className="text-lg">Links</p>
+      <p className="mb-8 text-sm">
+        Click on the button to copy link to clipboard
+      </p>
+      <div className="flex gap-2">
+        {links.map((link, i) => (
+          <DisplayLink link={link} index={i} />
         ))}
       </div>
     </div>
