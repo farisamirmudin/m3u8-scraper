@@ -7,7 +7,7 @@ type DramaType = {
   drama: string;
   episode: string;
 };
-const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3333";
+const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3000";
 export default function Drama({ drama, episode }: DramaType) {
   const dramaToFetch = `${drama}-episode-${episode}`;
   const linksToFetch = new URL(`${HOST}/api/dramas/episodes/servers`);
