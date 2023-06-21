@@ -35,9 +35,10 @@ export default function Home() {
           <div className="" key={i}>
             <Link
               className="hover:bg-violet-600"
-              href={`/${(regex.exec(drama.path) ?? [])[1]}/${
-                drama.path.split("-").at(-1) ?? 1
-              }`}
+              href={{
+                pathname: `/${(regex.exec(drama.path) ?? [])[1]}`,
+                query: { episode: `${drama.path.split("-").at(-1) ?? 1}` },
+              }}
             >
               {drama.title}
             </Link>
