@@ -22,7 +22,7 @@ export default function Home() {
         <input
           {...register("dramaName")}
           placeholder="Running man"
-          className="text-black flex-1 px-4 py-2 rounded-lg outline-none"
+          className="text-black flex-1 px-4 py-2 rounded-lg outline-none shadow-2xl hover:shadow-violet-600/50"
         />
         <input
           type="submit"
