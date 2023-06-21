@@ -26,7 +26,7 @@ export default async function Page({ params: { drama, episode } }: Params) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 break-all">
         {(links ?? []).map((link) => (
-          <p className="hover:bg-violet-600">{link}</p>
+          <p className="hover:bg-violet-600">{new URL(link).href}</p>
         ))}
       </div>
       <div className="episode-grid">
