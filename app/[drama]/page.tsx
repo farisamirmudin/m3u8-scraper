@@ -14,6 +14,7 @@ export default async function Page({
   params: { drama },
   searchParams: { episode },
 }: PageType) {
+  // reason why this is commented out: https://github.com/vercel/next.js/issues/44463
   // const urlToFetch = new URL("http://localhost:3000/api/dramas/episodes");
   // urlToFetch.searchParams.set("drama", `${drama}-episode-${episode}`);
   // const episodes = await fetch(urlToFetch)
