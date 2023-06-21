@@ -8,7 +8,6 @@ type Input = {
   dramaName: string;
 };
 
-const HOST = process.env.NEXT_PUBLIC_HOST_URL ?? "http://localhost:3000";
 export default function Home() {
   const [dramaList, setDramaList] = useState<Video[]>();
   const { register, handleSubmit } = useForm<Input>();
