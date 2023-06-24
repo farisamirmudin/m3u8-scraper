@@ -33,17 +33,16 @@ export default function Home() {
       </form>
       <div className="flex flex-col gap-2">
         {dramaList?.map((drama, i) => (
-          <div className="" key={i}>
-            <Link
-              className="hover:bg-violet-600"
-              href={{
-                pathname: `/${(regex.exec(drama.path) ?? [])[1]}`,
-                query: { episode: `${drama.path.split("-").at(-1) ?? 1}` },
-              }}
-            >
-              {drama.title}
-            </Link>
-          </div>
+          <Link
+            key={i}
+            className="hover:bg-violet-600"
+            href={{
+              pathname: `/${(regex.exec(drama.path) ?? [])[1]}`,
+              query: { episode: `${drama.path.split("-").at(-1) ?? 1}` },
+            }}
+          >
+            {drama.title}
+          </Link>
         ))}
       </div>
     </main>
