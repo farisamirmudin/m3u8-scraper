@@ -39,7 +39,8 @@ export default async function Page({ params: { drama, episode } }: Params) {
     <div className="">
       <p className="text-lg">Links</p>
       <p className="mb-8 text-sm">
-        Click on the button to copy link to clipboard
+        Click on the link to copy to clipboard. You can then play it using vlc,
+        mpv or iina.
       </p>
       <div className="flex gap-2">
         {links.map((link, i) => (

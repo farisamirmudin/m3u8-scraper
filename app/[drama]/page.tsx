@@ -1,6 +1,6 @@
 import { Video } from "@/typings/video";
 import { load } from "cheerio";
-import Link from "next/link";
+import DisplayShow from "./DisplayShow";
 
 type PageType = {
   params: {
@@ -37,19 +37,9 @@ export default async function Page({
       <p className="text-lg mb-8">Episodes</p>
 
       <div className="episode-grid">
-        {episodes.map((ep) => {
-          const regex = /videos\/(.*)-episode-\d+/;
-          const dramaName = (regex.exec(ep.path) ?? [])[1];
-          const selectedEpisode = ep.title.split(" ").at(-1) ?? "1";
-          return (
-            <Link
-              href={`/${dramaName}/${selectedEpisode}`}
-              className="text-center hover:bg-violet-600"
-            >
-              {selectedEpisode}
-            </Link>
-          );
-        })}
+        {episodes.map((ep) => (
+          <DisplayShow ep={ep} />
+        ))}
       </div>
     </div>
   );
