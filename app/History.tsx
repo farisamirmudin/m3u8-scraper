@@ -11,7 +11,7 @@ export default function History() {
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-lg">Selection History</p>
+      <p className="text-lg">Watch History</p>
       {dramas.map((drama, i) => (
         <Link
           key={i}

@@ -1,6 +1,6 @@
 import { load } from "cheerio";
-import DisplayLink from "./DisplayLink";
 import { decrypt, encrypt } from "@/utils/cipher";
+import Player from "./Player";
 
 type Params = {
   params: {
@@ -36,16 +36,15 @@ export default async function Page({ params: { drama, episode } }: Params) {
   const source = decrypt(enc.data, key, iv);
   const links = (source.match(/(https.+?m3u8)/g) ?? []) as string[];
   return (
-    <div className="">
-      <p className="text-lg">Links</p>
-      <p className="mb-8 text-sm">
-        Click on the link to copy to clipboard. You can then play it using vlc,
-        mpv or iina.
-      </p>
+    <div className="flex flex-col gap-4">
+      <div className="">
+        <p className="text-lg">Links</p>
+        <p className="text-sm">
+          Click on the link to play the video and copy link to clipboard.
+        </p>
+      </div>
       <div className="flex gap-2">
-        {links.map((link, i) => (
-          <DisplayLink link={link} index={i} />
-        ))}
+        <Player links={links} />
       </div>
     </div>
   );
