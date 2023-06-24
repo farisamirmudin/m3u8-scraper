@@ -17,6 +17,7 @@
     "cheerio": "1.0.0-rc.12",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.6",
+    "hls.js": "^1.4.6",
     "jotai": "^2.2.1",
     "next": "13.4.6",
     "postcss": "8.4.24",
