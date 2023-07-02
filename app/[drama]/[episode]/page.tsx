@@ -1,6 +1,8 @@
 import { load } from "cheerio";
 import { decrypt, encrypt } from "@/utils/cipher";
 import Player from "./Player";
+import Link from "next/link";
+import axios from "axios";
 
 type Params = {
   params: {
@@ -10,29 +12,25 @@ type Params = {
 };
 
 export default async function Page({ params: { drama, episode } }: Params) {
-  // const urlToFetch = new URL(`${HOST}/api/dramas/episodes/servers`);
-  // urlToFetch.searchParams.set("selection", `${drama}-episode-${episode}`);
-  // const links = await fetch(urlToFetch)
-  //   .then((res) => res.json())
-  //   .then((data) => data as string[]);
-  const key = "93422192433952489752342908585752";
-  const iv = "9262859232435825";
-  let res = await fetch(
-    `https://asianplay.net/videos/${drama}-episode-${episode}`
+  const key = process.env.NEXT_PUBLIC_KEY ?? "";
+  const iv = process.env.NEXT_PUBLIC_IV ?? "";
+  let res = await axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/videos/${drama}-episode-${episode}`
   );
-  const html = await res.text();
-  const $ = load(html);
+  const $ = load(res.data ?? "");
 
   const streaming = $("iframe").attr("src") ?? "";
   const id = new URL("https:" + streaming).searchParams.get("id") ?? "";
   const encId = encrypt(id, key, iv);
-  res = await fetch(`https://asianplay.net/encrypt-ajax.php?id=${encId}`, {
-    headers: {
-      "X-Requested-With": "XMLHttpRequest",
-    },
-  });
-
-  const enc = await res.json();
+  res = await axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/encrypt-ajax.php?id=${encId}`,
+    {
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    }
+  );
+  const enc = res.data as { data: string };
   const source = decrypt(enc.data, key, iv);
   const links = (source.match(/(https.+?m3u8)/g) ?? []) as string[];
   return (
@@ -40,12 +38,17 @@ export default async function Page({ params: { drama, episode } }: Params) {
       <div className="">
         <p className="text-lg">Links</p>
         <p className="text-sm">
-          Click on the link to play the video and copy link to clipboard.
+          Install{" "}
+          <Link
+            className="underline"
+            href="https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf"
+          >
+            Allow CORS: Access-Control-Allow-Origin extension
+          </Link>{" "}
+          if video is not playing.
         </p>
       </div>
-      <div className="flex gap-2">
-        <Player links={links} />
-      </div>
+      <Player links={links} />
     </div>
   );
 }

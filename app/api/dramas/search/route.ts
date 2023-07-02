@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const keyword = searchParams.get("keyword");
 
   if (!keyword) return NextResponse.json([]);
-  const search_url = new URL("http://asianplay.net/search.html");
+  const search_url = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/search.html`);
   search_url.searchParams.set("keyword", keyword);
   const res = await fetch(search_url);
   const html = await res.text();
