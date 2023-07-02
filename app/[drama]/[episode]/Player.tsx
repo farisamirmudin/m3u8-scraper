@@ -32,7 +32,7 @@ export default function Player({ links }: PlayerProps) {
           "fullscreen",
         ],
         quality: {
-          default: qualities[0],
+          default: Math.max(...qualities) ?? qualities[0],
           options: qualities,
           forced: true,
           onChange: (quality) => {
