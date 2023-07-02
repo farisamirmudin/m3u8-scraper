@@ -1,30 +1,25 @@
 import { Video } from "@/typings/video";
 import { load } from "cheerio";
 import DisplayShow from "./DisplayShow";
+import axios from "axios";
 
-type PageType = {
+interface PageProps {
   params: {
     drama: string;
   };
   searchParams: {
     episode: string;
   };
-};
+}
 export default async function Page({
   params: { drama },
   searchParams: { episode },
-}: PageType) {
-  // reason why this is commented out: https://github.com/vercel/next.js/issues/44463
-  // const urlToFetch = new URL("http://localhost:3000/api/dramas/episodes");
-  // urlToFetch.searchParams.set("drama", `${drama}-episode-${episode}`);
-  // const episodes = await fetch(urlToFetch)
-  //   .then((res) => res.json())
-  //   .then((data) => data as Video[]);
-  const res = await fetch(
-    `http://asianplay.net/videos/${drama}-episode-${episode}`
+}: PageProps) {
+  const res = await axios.get(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/videos/${drama}-episode-${episode}`
   );
-  const html = await res.text();
-  const $ = load(html);
+
+  const $ = load(res.data ?? "");
   const episodes = [] as Video[];
   $("ul.listing.items.lists li").each((_, el) => {
     const path = $(el).find("a").attr("href")?.trim() ?? "";

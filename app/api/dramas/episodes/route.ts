@@ -7,7 +7,9 @@ export async function GET(request: NextRequest) {
   const drama = searchParams.get("drama");
 
   if (!drama) return NextResponse.json([]);
-  const res = await fetch(`http://asianplay.net/videos/${drama}`);
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/videos/${drama}`
+  );
   const html = await res.text();
   const $ = load(html);
   const episodes = [] as Video[];

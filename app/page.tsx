@@ -1,5 +1,6 @@
 "use client";
 import { Video } from "@/typings/video";
+import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -12,10 +13,10 @@ export default function Home() {
   const [dramaList, setDramaList] = useState<Video[]>();
   const { register, handleSubmit } = useForm<Input>();
   const regex = /videos\/(.*)-episode-\d+/;
-  const onSubmit: SubmitHandler<Input> = (data) =>
-    fetch(`/api/dramas/search?keyword=${data.dramaName}`)
-      .then((res) => res.json())
-      .then(setDramaList);
+  const onSubmit: SubmitHandler<Input> = async (data) => {
+    const res = await axios.get(`/api/dramas/search?keyword=${data.dramaName}`);
+    setDramaList(res.data);
+  };
   return (
     <main className="flex flex-col gap-4">
       <p className="text-2xl">Search drama</p>
