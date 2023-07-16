@@ -1,4 +1,4 @@
-import { Video } from "@/typings/video";
+import type { Video } from "@/typings/video";
 import { load } from "cheerio";
 import DisplayShow from "./DisplayShow";
 import axios from "axios";
