@@ -28,14 +28,17 @@ export default async function Page({
     episodes.push({ title, path, img });
   });
   return (
-    <div className="">
-      <p className="text-lg mb-8">Episodes</p>
-
-      <div className="episode-grid">
-        {episodes.map((ep) => (
-          <DisplayShow ep={ep} />
-        ))}
-      </div>
-    </div>
+    <ul className="menu bg-base-200 rounded-box max-h-[400px] overflow-scroll">
+      <li>
+        <h2 className="menu-title">Episode:</h2>
+        <ul>
+          {episodes?.map((episode) => (
+            <li>
+              <DisplayShow episode={episode} />
+            </li>
+          ))}
+        </ul>
+      </li>
+    </ul>
   );
 }
