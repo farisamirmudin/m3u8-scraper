@@ -1,51 +1,37 @@
 "use client";
-import { Video } from "@/typings/video";
-import axios from "axios";
+import { useAtom } from "jotai";
 import Link from "next/link";
-import { useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-
-type Input = {
-  dramaName: string;
-};
+import { foundList } from "./atom";
 
 export default function Home() {
-  const [dramaList, setDramaList] = useState<Video[]>();
-  const { register, handleSubmit } = useForm<Input>();
+  const [dramas] = useAtom(foundList);
   const regex = /videos\/(.*)-episode-\d+/;
-  const onSubmit: SubmitHandler<Input> = async (data) => {
-    const res = await axios.get(`/api/dramas/search?keyword=${data.dramaName}`);
-    setDramaList(res.data);
-  };
+
   return (
-    <main className="flex flex-col gap-4">
-      <p className="text-2xl">Search drama</p>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex gap-2">
-        <input
-          {...register("dramaName")}
-          placeholder="Running man"
-          className="text-black flex-1 px-4 py-2 rounded-lg outline-none shadow-2xl hover:shadow-violet-600/50"
-        />
-        <input
-          type="submit"
-          defaultValue="Search"
-          className="cursor-pointer hover:bg-violet-600 px-4 rounded-lg"
-        />
-      </form>
-      <div className="flex flex-col gap-2">
-        {dramaList?.map((drama, i) => (
-          <Link
-            key={i}
-            className="hover:bg-violet-600"
-            href={{
-              pathname: `/${(regex.exec(drama.path) ?? [])[1]}`,
-              query: { episode: `${drama.path.split("-").at(-1) ?? 1}` },
-            }}
-          >
-            {drama.title}
-          </Link>
-        ))}
-      </div>
+    <main>
+      {dramas.length > 0 && (
+        <ul className="menu bg-base-200 rounded-box">
+          <li>
+            <h2 className="menu-title">Drama:</h2>
+            <ul>
+              {dramas?.map(({ title, path }) => (
+                <li>
+                  <Link
+                    prefetch={false}
+                    key={title}
+                    href={{
+                      pathname: `/${(regex.exec(path) ?? [])[1]}`,
+                      query: { episode: `${path.split("-").at(-1) ?? 1}` },
+                    }}
+                  >
+                    {title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+        </ul>
+      )}
     </main>
   );
 }

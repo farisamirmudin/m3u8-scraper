@@ -36,7 +36,6 @@ export default async function Page({ params: { drama, episode } }: Params) {
   return (
     <div className="flex flex-col gap-4">
       <div className="">
-        <p className="text-lg">Links</p>
         <p className="text-sm">
           Install{" "}
           <Link
