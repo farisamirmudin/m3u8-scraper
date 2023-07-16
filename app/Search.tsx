@@ -1,14 +1,15 @@
 "use client";
 import axios from "axios";
-import { useAtom } from "jotai";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useSetAtom } from "jotai";
+import type { SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { foundList } from "./atom";
 
 type Input = {
   dramaName: string;
 };
 export function Search() {
-  const [_, setDramaList] = useAtom(foundList);
+  const setDramaList = useSetAtom(foundList);
 
   const { register, handleSubmit } = useForm<Input>();
   const onSubmit: SubmitHandler<Input> = async ({ dramaName }) => {

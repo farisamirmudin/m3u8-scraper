@@ -10,10 +10,10 @@ interface PlayerProps {
 
 export default function Player({ links }: PlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hls = new Hls();
 
   useEffect(() => {
     if (!videoRef.current) return;
+    const hls = new Hls();
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       const qualities = hls.levels.map((level) => level.height);
       new Plyr(videoRef.current as HTMLVideoElement, {

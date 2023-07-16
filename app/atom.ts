@@ -1,4 +1,4 @@
-import { Video } from "@/typings/video";
+import type { Video } from "@/typings/video";
 import { atom } from "jotai";
 
 export const historyList = atom<Video[]>([]);
