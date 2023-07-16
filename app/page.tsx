@@ -2,6 +2,7 @@
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { foundList } from "./atom";
+import { Search } from "./Search";
 
 export default function Home() {
   const [dramas] = useAtom(foundList);
@@ -9,6 +10,9 @@ export default function Home() {
 
   return (
     <main>
+      <div className="flex-1">
+        <Search />
+      </div>
       {dramas.length > 0 && (
         <ul className="menu bg-base-200 rounded-box">
           <li>

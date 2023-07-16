@@ -1,5 +1,5 @@
+import Link from "next/link";
 import History from "./History";
-import { Search } from "./Search";
 import "./globals.css";
 
 export const metadata = {
@@ -19,12 +19,12 @@ export default function RootLayout({
           <input id="my-drawer" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content space-y-4">
             <div className="flex gap-4">
-              <label htmlFor="my-drawer" className="btn btn-neutral">
+              <Link href="/" className="btn btn-sm btn-outline">
+                Go to home
+              </Link>
+              <label htmlFor="my-drawer" className="btn btn-sm">
                 See History
               </label>
-              <div className="flex-1">
-                <Search />
-              </div>
             </div>
             <div>{children}</div>
           </div>
