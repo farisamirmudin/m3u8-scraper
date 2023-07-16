@@ -32,8 +32,8 @@ export default async function Page({
       <li>
         <h2 className="menu-title">Episode:</h2>
         <ul>
-          {episodes?.map((episode) => (
-            <li>
+          {episodes?.map((episode, i) => (
+            <li key={i}>
               <DisplayShow episode={episode} />
             </li>
           ))}

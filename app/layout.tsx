@@ -17,16 +17,26 @@ export default function RootLayout({
       <body className="p-8">
         <div className="drawer">
           <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content space-y-4">
-            <div className="flex gap-4">
-              <Link href="/" className="btn btn-sm btn-outline">
-                Go to home
-              </Link>
-              <label htmlFor="my-drawer" className="btn btn-sm">
-                See History
-              </label>
+          <div className="drawer-content">
+            <div className="hero min-h-screen bg-base-200">
+              <div className="hero-content flex-col">
+                <div className="flex gap-4">
+                  <Link href="/" className="btn btn-sm btn-outline">
+                    Go to home
+                  </Link>
+                  <label htmlFor="my-drawer" className="btn btn-sm">
+                    See History
+                  </label>
+                </div>
+                <h1 className="text-5xl font-bold">M3U8 Scraper</h1>
+                <p className="py-6">
+                  This project uses Next.js 13 app directory, cheerio, hls.js
+                  and plyr.js to scrape and play a m3u8 link from a korean
+                  streaming website.
+                </p>
+                <div>{children}</div>
+              </div>
             </div>
-            <div>{children}</div>
           </div>
           <div className="drawer-side">
             <label htmlFor="my-drawer" className="drawer-overlay"></label>

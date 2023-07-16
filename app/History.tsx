@@ -14,9 +14,8 @@ export default function History() {
         <h2 className="menu-title">History:</h2>
         <ul>
           {dramas?.map(({ title, path }, i) => (
-            <li>
+            <li key={i}>
               <Link
-                key={i}
                 href={{
                   pathname: `/${(regex.exec(path) ?? [])[1]}`,
                   query: { episode: `${path.split("-").at(-1) ?? 1}` },

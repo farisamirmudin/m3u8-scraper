@@ -18,8 +18,8 @@ export default function Home() {
           <li>
             <h2 className="menu-title">Drama:</h2>
             <ul>
-              {dramas?.map(({ title, path }) => (
-                <li>
+              {dramas?.map(({ title, path }, i) => (
+                <li key={i}>
                   <Link
                     prefetch={false}
                     key={title}
