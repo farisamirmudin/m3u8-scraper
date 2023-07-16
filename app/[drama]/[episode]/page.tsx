@@ -35,18 +35,16 @@ export default async function Page({ params: { drama, episode } }: Params) {
   const links = (source.match(/(https.+?m3u8)/g) ?? []) as string[];
   return (
     <div className="flex flex-col gap-4">
-      <div className="">
-        <p className="text-sm">
-          Install{" "}
-          <Link
-            className="underline"
-            href="https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf"
-          >
-            Allow CORS: Access-Control-Allow-Origin extension
-          </Link>{" "}
-          if video is not playing.
-        </p>
-      </div>
+      <p className="text-sm text-center">
+        Install{" "}
+        <Link
+          className="underline"
+          href="https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf"
+        >
+          Allow CORS: Access-Control-Allow-Origin extension
+        </Link>{" "}
+        if video is not playing.
+      </p>
       <Player links={links} />
     </div>
   );
