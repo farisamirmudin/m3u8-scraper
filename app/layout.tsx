@@ -21,7 +21,7 @@ export default function RootLayout({
             <Navbar />
             <div className="hero bg-base-200 flex-1">
               <div className="hero-content flex-col">
-                <h1 className="text-5xl font-bold">M3U8 Scraper</h1>
+                <h1 className="text-5xl font-bold">Scrape for M3U8 link</h1>
                 <p className="py-6">
                   This project uses Next.js 13 app directory, cheerio, hls.js
                   and plyr.js to scrape and play a m3u8 link from a korean
