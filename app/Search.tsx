@@ -25,7 +25,7 @@ export function Search() {
           className="input input-bordered w-full"
           {...register("dramaName")}
         />
-        <button className="btn btn-square">
+        <button className="btn btn-outline btn-square">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"
