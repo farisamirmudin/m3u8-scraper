@@ -4,7 +4,9 @@ export default function Navbar() {
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
-        <a className="btn btn-ghost normal-case text-xl">M3U8 Scraper</a>
+        <Link href="/" className="btn btn-ghost normal-case text-xl">
+          M3U8 Scraper
+        </Link>
       </div>
       <div className="flex-none dropdown dropdown-end">
         <button className="btn btn-square btn-ghost">
@@ -26,9 +28,6 @@ export default function Navbar() {
           tabIndex={0}
           className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
         >
-          <Link href="/" className="btn btn-outline btn-accent">
-            Home
-          </Link>
           <label htmlFor="my-drawer" className="btn btn-outline btn-accent">
             See History
           </label>
