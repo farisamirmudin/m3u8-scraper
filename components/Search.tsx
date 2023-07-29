@@ -3,7 +3,7 @@ import axios from "axios";
 import { useSetAtom } from "jotai";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import { foundList } from "./atom";
+import { foundList } from "../app/atom";
 
 type Input = {
   dramaName: string;

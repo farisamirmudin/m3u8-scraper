@@ -2,7 +2,7 @@
 import { useAtom } from "jotai";
 import Link from "next/link";
 import { foundList } from "./atom";
-import { Search } from "./Search";
+import { Search } from "@/components/Search";
 
 export default function Home() {
   const [dramas] = useAtom(foundList);
