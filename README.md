@@ -2,7 +2,9 @@
 
 ## Getting Started
 
-First, run the development server:
+Run the server:
+
+Locally:
 
 ```bash
 npm run dev
@@ -10,6 +12,13 @@ npm run dev
 yarn dev
 # or
 pnpm dev
+```
+
+Docker:
+
+```bash
+docker-compose build
+docker-compose up
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
