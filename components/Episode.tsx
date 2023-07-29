@@ -3,9 +3,9 @@
 import { useSetAtom } from "jotai";
 import Link from "next/link";
 import type { Video } from "@/typings/video";
-import { historyList } from "../atom";
+import { historyList } from "../app/atom";
 
-export default function DisplayShow({ episode }: { episode: Video }) {
+export default function Episode({ episode }: { episode: Video }) {
   const setDramas = useSetAtom(historyList);
   const regex = /videos\/(.*)-episode-\d+/;
   const dramaName = (regex.exec(episode.path) ?? [])[1];

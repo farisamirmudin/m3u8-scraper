@@ -16,7 +16,8 @@ export default function Player({ links }: PlayerProps) {
     const hls = new Hls();
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
       const qualities = hls.levels.map((level) => level.height);
-      new Plyr(videoRef.current as HTMLVideoElement, {
+      if (!videoRef.current) return;
+      new Plyr(videoRef.current, {
         controls: [
           "play-large",
           "restart",
@@ -55,7 +56,7 @@ export default function Player({ links }: PlayerProps) {
   }, [videoRef, links]);
 
   return (
-    <div className="w-[1080px] h-[720px]">
+    <div>
       <video ref={videoRef} controls autoPlay />
     </div>
   );

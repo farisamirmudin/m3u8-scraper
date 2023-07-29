@@ -1,13 +1,14 @@
 "use client";
 
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import Link from "next/link";
-import { historyList } from "./atom";
+import { historyList } from "../app/atom";
 
 export default function History() {
-  const [dramas] = useAtom(historyList);
+  const dramas = useAtomValue(historyList);
   const regex = /videos\/(.*)-episode-\d+/;
 
+  if (dramas.length === 0) return null;
   return (
     <ul className="menu bg-base-200 rounded-box">
       <li>

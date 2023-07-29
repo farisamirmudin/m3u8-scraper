@@ -1,6 +1,6 @@
 import { load } from "cheerio";
 import { decrypt, encrypt } from "@/utils/cipher";
-import Player from "./Player";
+import Player from "@/components/Player";
 import Link from "next/link";
 import axios from "axios";
 

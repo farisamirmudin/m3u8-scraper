@@ -1,6 +1,6 @@
 import type { Video } from "@/typings/video";
 import { load } from "cheerio";
-import DisplayShow from "./DisplayShow";
+import Episode from "@/components/Episode";
 import axios from "axios";
 
 interface PageProps {
@@ -34,7 +34,7 @@ export default async function Page({
         <ul>
           {episodes?.map((episode, i) => (
             <li key={i}>
-              <DisplayShow episode={episode} />
+              <Episode episode={episode} />
             </li>
           ))}
         </ul>
