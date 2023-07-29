@@ -1,11 +1,11 @@
 "use client";
-import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
 import Link from "next/link";
 import { foundList } from "./atom";
 import { Search } from "@/components/Search";
 
 export default function Home() {
-  const [dramas] = useAtom(foundList);
+  const dramas = useAtomValue(foundList);
   const regex = /videos\/(.*)-episode-\d+/;
 
   return (
