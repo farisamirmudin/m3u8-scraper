@@ -1,18 +1,16 @@
 import { decrypt, encrypt } from "@/utils/cipher";
 import { load } from "cheerio";
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const selection = searchParams.get("selection");
+  const path = searchParams.get("path");
 
-  if (!selection) return NextResponse.json([]);
+  if (!path) return NextResponse.json([]);
   const key = process.env.NEXT_PUBLIC_KEY ?? "";
   const iv = process.env.NEXT_PUBLIC_IV ?? "";
-  let res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/videos/${selection}`
-  );
+  let res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${path}`);
   const html = await res.text();
   const $ = load(html);
 

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import History from "@/components/History";
 import "./globals.css";
 
 export const metadata = {
@@ -15,18 +14,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="hero bg-base-200 min-h-screen">
-          <div className="hero-content flex-col">
-            <Link href="/" className="text-5xl font-bold">
+        <div className="">
+          <div className="">
+            <Link href="/" className="">
               M3U8 Scraper
             </Link>
-            <p className="mb-8">
-              This project uses Next.js 13 app directory, cheerio, hls.js and
-              plyr.js to scrape and play a m3u8 link from a korean streaming
-              website.
+            <p className="">
+              This project uses Next.js 14 RSC, cheerio, hls.js and plyr.js to
+              scrape and play a m3u8 link from a korean streaming website.
             </p>
             <div>{children}</div>
-            <History />
           </div>
         </div>
       </body>
