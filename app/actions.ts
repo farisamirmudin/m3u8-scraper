@@ -68,8 +68,7 @@ export const getDramas = async (
 
   try {
     const res = await fetch(searchUrl);
-    const html = await res.text();
-    const $ = load(html);
+    const $ = load((await res.text()) ?? "");
     const videos = [] as Video[];
     $("li.video-block").each((_, el) => {
       const title = $(el).find(".name").text().trim() || "";

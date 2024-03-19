@@ -18,7 +18,7 @@ export default function EpisodeSelection({
       value={selectedEpisode}
       onChange={(e) => router.push(episodePath(e.currentTarget.value))}
     >
-      {episodes?.map((episode, index) => (
+      {episodes.map((episode, index) => (
         <option key={index} value={episode.path}>
           {episode.path.split("-").at(-1) ?? 1}
         </option>
