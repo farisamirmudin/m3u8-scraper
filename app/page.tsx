@@ -51,6 +51,7 @@ export default function Home() {
             />
             <Submit />
           </div>
+          <p className="text-xs text-red-600">{state.error}</p>
         </form>
       </div>
       <ul>
