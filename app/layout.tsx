@@ -14,18 +14,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="">
-          <div className="">
-            <Link href="/" className="">
-              M3U8 Scraper
-            </Link>
-            <p className="">
-              This project uses Next.js 14 RSC, cheerio, hls.js and plyr.js to
-              scrape and play a m3u8 link from a korean streaming website.
-            </p>
-            <div>{children}</div>
-          </div>
-        </div>
+        <Link href="/" className="text-4xl font-bold">
+          M3U8 Scraper
+        </Link>
+        <div>{children}</div>
       </body>
     </html>
   );

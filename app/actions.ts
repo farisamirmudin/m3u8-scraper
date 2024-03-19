@@ -55,18 +55,33 @@ export const getDramas = async (
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> => {
-  const keyword = formData.get("keyword");
+  const keyword = formData.get("keyword") as string;
+  if (!keyword)
+    return {
+      message: "success",
+      error: "",
+      data: [],
+    };
+
+  const searchUrl = new URL(`${process.env.NEXT_PUBLIC_BASE_URL}/search.html`);
+  searchUrl.searchParams.set("keyword", keyword);
 
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/dramas/search?keyword=${keyword}`
-    );
-    const data = (await res.json()) as Video[];
+    const res = await fetch(searchUrl);
+    const html = await res.text();
+    const $ = load(html);
+    const videos = [] as Video[];
+    $("li.video-block").each((_, el) => {
+      const title = $(el).find(".name").text().trim() || "";
+      const img = $(el).find("img").attr("src") || "";
+      const path = $(el).find("a").attr("href") || "";
+      videos.push({ title, img, path });
+    });
 
     return {
       message: "success",
       error: "",
-      data,
+      data: videos,
     };
   } catch (error) {
     return {

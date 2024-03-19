@@ -66,7 +66,7 @@ export default function Player({ servers }: PlayerProps) {
           value={selectedServer}
           onChange={(e) => setSelectedServer(e.currentTarget.value)}
         >
-          {servers?.map((server, index) => (
+          {servers.map((server, index) => (
             <option key={index} value={server}>
               {index + 1}
             </option>
